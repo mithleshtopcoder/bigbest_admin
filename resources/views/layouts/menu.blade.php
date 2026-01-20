@@ -192,6 +192,31 @@
 </li>
 @endcanany
 
+<li class="menu-item has-submenu {{ request()->routeIs('vendors.*') ? 'open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('vendors.*') ? 'active' : '' }}">
+        <i class="bi bi-shop menu-icon"></i>
+        <span class="menu-text">Vendor Management</span>
+        <i class="bi bi-chevron-right menu-arrow"></i>
+    </a>
+
+    <ul class="submenu">
+
+        <li class="menu-item">
+            <a href="{{ route('vendors.index') }}" class="menu-link {{ request()->routeIs('vendors.index') ? 'active' : '' }}">
+                Vendor List
+            </a>
+        </li>
+
+        <li class="menu-item">
+            <a href="{{ route('vendor-payouts.index') }}" class="menu-link {{ request()->routeIs('vendors.payouts*') ? 'active' : '' }}">
+                Vendor Payouts
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
 @canany(['purchase-order.list','purchase-invoice.list','grn-master.list','purchase-return.list'])
 <li class="menu-item has-submenu {{ request()->routeIs('procurement.*') ? 'open' : '' }}">
     <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('procurement.*') ? 'active' : '' }}">
@@ -529,4 +554,70 @@
     </ul>
 </li>
 @endcanany
+
+@if(auth()->check() && auth()->user()->user_type === 'vendor')
+
+
+{{-- ================= Dashboard ================= --}}
+<li class="menu-item {{ request()->routeIs('vendor.dashboard') ? 'open' : '' }}">
+    <a href="{{ route('vendor.dashboard') }}" class="menu-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
+        <i class="bi bi-speedometer2 menu-icon"></i>
+        <span class="menu-text">Dashboard</span>
+    </a>
+</li>
+
+{{-- ================= Manage Products ================= --}}
+<li class="menu-item has-submenu {{ request()->routeIs('vendor.products.*') ? 'open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}">
+        <i class="bi bi-box-seam menu-icon"></i>
+        <span class="menu-text">Manage Products</span>
+        <i class="bi bi-chevron-right menu-arrow"></i>
+    </a>
+
+    <ul class="submenu">
+        <li class="menu-item">
+            <a href="{{ route('vendor.products.create') }}" class="menu-link {{ request()->routeIs('vendor.products.create') ? 'active' : '' }}">
+                Add Product
+            </a>
+        </li>
+
+        <li class="menu-item">
+            <a href="{{ route('vendor.products.index') }}" class="menu-link {{ request()->routeIs('vendor.products.index') ? 'active' : '' }}">
+                My Products
+            </a>
+        </li>
+    </ul>
+</li>
+
+{{-- ================= Manage Orders ================= --}}
+<li class="menu-item {{ request()->routeIs('vendor.orders.*') ? 'open' : '' }}">
+    <a href="{{ route('vendor.orders.index') }}" class="menu-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}">
+        <i class="bi bi-cart-check menu-icon"></i>
+        <span class="menu-text">Manage Orders</span>
+    </a>
+</li>
+
+{{-- ================= Payouts ================= --}}
+<li class="menu-item {{ request()->routeIs('vendor.payouts.*') ? 'open' : '' }}">
+    <a href="{{ route('vendor.payouts.index') }}" class="menu-link {{ request()->routeIs('vendor.payouts.*') ? 'active' : '' }}">
+        <i class="bi bi-wallet2 menu-icon"></i>
+        <span class="menu-text">Payouts</span>
+    </a>
+</li>
+
+{{-- ================= Profile ================= --}}
+<li class="menu-item {{ request()->routeIs('vendor.profile') ? 'open' : '' }}">
+    <a href="{{ route('vendor.profile') }}" class="menu-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}">
+        <i class="bi bi-person-circle menu-icon"></i>
+        <span class="menu-text">My Profile</span>
+    </a>
+</li>
+
+@endif
+
+
+
+
+
+
 </ul>

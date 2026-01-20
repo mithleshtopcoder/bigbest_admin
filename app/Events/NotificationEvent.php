@@ -8,7 +8,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class NotificationEvent implements ShouldBroadcast
 {
@@ -24,21 +23,13 @@ class NotificationEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         // Send to private channel of the specific customer
-        $channel = 'notifications.' . $this->notification->customer_id;
-
-        Log::info('Broadcasting notification event', [
-            'notification_id' => $this->notification->id,
-            'customer_id' => $this->notification->customer_id,
-            'channel' => $channel,
-        ]);
-
-        return new PrivateChannel($channel);
+        return new PrivateChannel('notifications.' . $this->notification->customer_id);
     }
 
     public function broadcastWith()
     {
         // Data sent to frontend
-        $payload = [
+        return [
             'id' => $this->notification->id,
             'title' => $this->notification->title,
             'message' => $this->notification->message,
@@ -47,12 +38,5 @@ class NotificationEvent implements ShouldBroadcast
             'sent_at' => $this->notification->sent_at,
             'is_read' => $this->notification->is_read,
         ];
-
-        Log::info('Notification event payload prepared', [
-            'notification_id' => $this->notification->id,
-            'customer_id' => $this->notification->customer_id,
-        ]);
-
-        return $payload;
     }
 }

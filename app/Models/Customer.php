@@ -35,7 +35,6 @@ class Customer extends Authenticatable
         'loyalty_points',
         'status',
         'device_token',
-        'device_id',
         'fcm_token',
         'email_verified_at',
         'phone_verified_at',

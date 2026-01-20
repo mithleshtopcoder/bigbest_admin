@@ -13,75 +13,74 @@ class RecentlyViewedController extends Controller
     /**
      * Get recently viewed products for authenticated customer
      */
-
     public function index(Request $request)
-    {
-        try {
-            $customer = $request->user();
-            $storeId  = $request->query('store_id'); // optional
+{
+    try {
+        $customer = $request->user();
+        $storeId  = $request->query('store_id'); // optional
 
-            $perPage = $request->get('per_page', 20);
-            $limit   = $request->get('limit', 50);
+        $perPage = $request->get('per_page', 20);
+        $limit   = $request->get('limit', 50);
 
-            $recentlyViewed = RecentlyViewedProduct::where('customer_id', $customer->id)
-                ->with([
-                    'product.category',
-                    'product.brand',
-                    'product.images' => fn ($q) => $q->where('is_primary', true),
-                    'product.variants' => function ($q) use ($storeId) {
-                        $q->where('is_active', true)
-                        ->orderBy('sort_order')
-                        ->with([
-                            'prices' => function ($q2) {
-                                $q2->where('is_active', true)
-                                    ->where(function ($q) {
-                                        $q->whereNull('effective_from')
-                                        ->orWhere('effective_from', '<=', now());
-                                    })
-                                    ->where(function ($q) {
-                                        $q->whereNull('effective_to')
-                                        ->orWhere('effective_to', '>=', now());
-                                    })
-                                    ->orderBy('effective_from', 'desc');
-                            },
-                            'stocks' => function ($q2) use ($storeId) {
-                                if ($storeId) {
-                                    $q2->where('store_id', $storeId);
-                                }
-                            }
-                        ]);
-                    }
-                ])
-                ->orderBy('viewed_at', 'desc')
-                ->limit($limit)
-                ->paginate($perPage);
+        $recentlyViewed = RecentlyViewedProduct::where('customer_id', $customer->id)
+            ->with([
+                'product.category',
+                'product.brand',
+                'product.images' => fn ($q) => $q->where('is_primary', true),
+                'product.variants' => function ($q) use ($storeId) {
+                    $q->where('is_active', true)
+                      ->orderBy('sort_order')
+                      ->with([
+                          'prices' => function ($q2) {
+                              $q2->where('is_active', true)
+                                 ->where(function ($q) {
+                                     $q->whereNull('effective_from')
+                                       ->orWhere('effective_from', '<=', now());
+                                 })
+                                 ->where(function ($q) {
+                                     $q->whereNull('effective_to')
+                                       ->orWhere('effective_to', '>=', now());
+                                 })
+                                 ->orderBy('effective_from', 'desc');
+                          },
+                          'stocks' => function ($q2) use ($storeId) {
+                              if ($storeId) {
+                                  $q2->where('store_id', $storeId);
+                              }
+                          }
+                      ]);
+                }
+            ])
+            ->orderBy('viewed_at', 'desc')
+            ->limit($limit)
+            ->paginate($perPage);
 
-            // Attach price & stock like Featured API
-            $recentlyViewed->getCollection()->transform(function ($item) {
-                $item->product->variants->each(function ($variant) {
-                    $variant->current_price = $variant->prices->first();
-                    $variant->stock = $variant->stocks->first();
+        // Attach price & stock like Featured API
+        $recentlyViewed->getCollection()->transform(function ($item) {
+            $item->product->variants->each(function ($variant) {
+                $variant->current_price = $variant->prices->first();
+                $variant->stock = $variant->stocks->first();
 
-                    unset($variant->prices, $variant->stocks);
-                });
-
-                return $item;
+                unset($variant->prices, $variant->stocks);
             });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Recently viewed products retrieved successfully',
-                'data' => $recentlyViewed,
-            ], 200);
+            return $item;
+        });
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve recently viewed products',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Recently viewed products retrieved successfully',
+            'data' => $recentlyViewed,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to retrieve recently viewed products',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
 
 
     /**

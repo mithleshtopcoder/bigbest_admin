@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Events\NotificationEvent;
+use App\Jobs\SendNotificationJob;
 use App\Models\Notification;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -254,7 +255,20 @@ class NotificationController extends Controller
      */
    public function createNotification($customerId, $type, $title, $message, $data = [])
 {
-    return NotificationService::send($customerId, $type, $title, $message, $data);
+    $notification = Notification::create([
+        'customer_id' => $customerId,
+        'type' => $type,
+        'title' => $title,
+        'message' => $message,
+        'data' => $data,
+        'sent_at' => now(),
+        'is_read' => false,
+    ]);
+
+    // Dispatch a job to broadcast the notification
+    SendNotificationJob::dispatch($notification);
+
+    return $notification;
 }
 
 }

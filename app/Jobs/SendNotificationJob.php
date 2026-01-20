@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\Notification;
 use App\Events\NotificationEvent;
-use App\Services\NotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,6 +34,5 @@ class SendNotificationJob implements ShouldQueue
         // Fire the broadcast event
         // toOthers() ensures the sender does not receive the broadcast
         broadcast(new NotificationEvent($this->notification))->toOthers();
-        NotificationService::sendPushNotification($this->notification);
     }
 }

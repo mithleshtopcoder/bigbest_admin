@@ -371,7 +371,6 @@ public function index(Request $request)
         ->get();
 
     $products->each(function ($product) use ($storeId) {
-        $product->imageUrl = $product->thumbnail_image;
 
         $product->load(['variants' => function ($q) {
             $q->where('is_active', true)->orderBy('sort_order');

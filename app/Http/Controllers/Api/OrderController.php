@@ -11,7 +11,8 @@ use App\Models\ProductStock;
 use App\Models\CustomerAddress;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Services\NotificationService;
+use App\Models\Notification;
+use App\Events\NotificationEvent;
 use App\Services\InvoiceService;
 use App\Services\CartPricingService;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ use App\Helpers\MyHelper;
 
 class OrderController extends Controller
 {
+
     /**
      * Get all orders for authenticated customer
      */
@@ -457,20 +459,26 @@ return response()->json([
                 }
             }
 
-            NotificationService::send(
-                $customer->id,
-                'order',
-                'Order Cancelled',
-                'Your order #' . $order->order_number . ' has been cancelled successfully.',
-                [
+            // Create notification
+            $notification = Notification::create([
+                'customer_id' => $customer->id,
+                'type' => 'order',
+                'title' => 'Order Cancelled',
+                'message' => 'Your order #' . $order->order_number . ' has been cancelled successfully.',
+                'data' => [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'refund_amount' => $order->wallet_amount_used > 0 || $order->loyalty_points_used > 0
-                        ? $order->total_amount
+                    'refund_amount' => $order->wallet_amount_used > 0 || $order->loyalty_points_used > 0 
+                        ? $order->total_amount 
                         : 0,
                 ],
-                "/orders/{$order->id}"
-            );
+                'action_url' => "/orders/{$order->id}",
+                'is_read' => false,
+                'sent_at' => now(),
+            ]);
+
+            // Broadcast notification
+            event(new NotificationEvent($notification));
 
             DB::commit();
 

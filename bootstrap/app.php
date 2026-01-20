@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\LogUserActivity::class,
         ]);
+        $middleware->alias([
+        'vendor' => \App\Http\Middleware\VendorMiddleware::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -46,6 +46,11 @@ class Product extends Model
         'view_count',
         'rating',
         'total_reviews',
+        'vendor_id',
+         'approval_status',
+    'rejection_reason',
+    'approved_at',
+    'approved_by',
     ];
 
     protected $casts = [
@@ -125,7 +130,7 @@ class Product extends Model
 
     public function getThumbnailImageAttribute($value)
 {
-    return $value ? url('images/products/' . $value) : null;
+    return $value ? url('images/product_thumbnail/' . $value) : null;
 }
 
     
@@ -151,4 +156,11 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class)->where('status', 'approved');
     }
+
+    public function vendor()
+{
+    return $this->belongsTo(Vendor::class, 'vendor_id', 'id'); 
+    // 'vendor_id' = foreign key in products table
+    // 'id'        = primary key in vendors table
+}
 }

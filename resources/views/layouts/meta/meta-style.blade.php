@@ -55,7 +55,6 @@
 
     .table-responsive {
         overflow-x: auto;
-        min-height: 409px;
         -webkit-overflow-scrolling: touch;
     }
 

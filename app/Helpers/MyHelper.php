@@ -2,7 +2,8 @@
 
 namespace App\Helpers;
 use App\Models\Notification;
-use App\Jobs\SendNotificationJob;
+use App\Events\NotificationEvent;
+
 use Illuminate\Support\Facades\File;
 
 class MyHelper
@@ -177,7 +178,7 @@ class MyHelper
         ]);
 
         if ($broadcast) {
-            SendNotificationJob::dispatch($notification);
+            event(new NotificationEvent($notification));
         }
 
         return $notification;

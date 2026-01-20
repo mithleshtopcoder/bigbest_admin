@@ -48,38 +48,16 @@ use App\Http\Controllers\OptionController;
 use App\Http\Controllers\OptionMasterController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use Kreait\Firebase\Factory;
+use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\VendorKycController;
+use App\Http\Controllers\Admin\VendorPayoutController;
+use App\Http\Controllers\Vendor\VendorProductController;
+
+
+
+
 
 Route::middleware('auth')->group(function () {
-
-
-
-    Route::get('/firebase-test', function () {
-        $credentials = config('firebase.projects.app.credentials.file');
-
-        if ($credentials && !str_starts_with($credentials, DIRECTORY_SEPARATOR)) {
-            $credentials = base_path($credentials);
-        }
-
-        if (!$credentials) {
-            $credentials = storage_path('app/firebase/firebase-adminsdk.json');
-        }
-
-        if (!$credentials || !file_exists($credentials)) {
-            return response()->json([
-                'error' => 'Firebase credentials file not found',
-                'path' => $credentials,
-            ], 500);
-        }
-
-        $factory = (new Factory)->withServiceAccount($credentials);
-        $firestore = $factory->createFirestore();
-
-        return 'Firebase Connected Successfully';
-    });
-
-    
-
     // ==================== BASIC ROUTES ====================
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::get('/blank', [ProfileController::class, 'blank'])->name('blank');
@@ -132,6 +110,9 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete/{id}', [ProductMasterController::class, 'destroy'])->name('manage-product.product-master.destroy');
             Route::get('/datatable', [ProductMasterController::class, 'datatable'])->name('manage-product.product-master.datatable');
             Route::put('/update-item-info/{id}', [ProductMasterController::class, 'updateItemInfo']) ->name('manage-product.product-master.update-item-info');
+            Route::post('{product}/approve', [ProductMasterController::class, 'approve'])->name('manage-product.product-master.approve');
+            Route::post('{product}/reject', [ProductMasterController::class, 'reject'])->name('manage-product.product-master.reject');
+            
             // Product Variants // ok done
             Route::prefix('product/{product_id}')->group(function () {
                 Route::get('/variants', [ProductVariantController::class, 'index'])->name('manage-product.product-master.variants.index');
@@ -693,6 +674,62 @@ Route::middleware('auth')->group(function () {
         ]);
         dd($response->body());
     });
+
+Route::prefix('vendors')->name('vendors.')->group(function () {
+
+    // Vendor CRUD
+    Route::get('/', [VendorController::class, 'index'])->name('index');
+    Route::get('/create', [VendorController::class, 'create'])->name('create');
+    Route::post('/', [VendorController::class, 'store'])->name('store'); // ✅ Add this
+    Route::get('/{vendor}', [VendorController::class, 'show'])->name('show');
+Route::delete('/{vendor}', [VendorController::class, 'destroy'])->name('destroy');
+// Approve Vendor
+Route::post('/{vendor}/approve', [VendorController::class, 'approve'])->name('approve');
+
+// Reject Vendor
+Route::post('/{vendor}/reject', [VendorController::class, 'reject'])->name('reject');
 });
+
+Route::prefix('admin/vendor-payouts')->name('vendor-payouts.')->group(function () {
+
+    Route::get('/', [VendorPayoutController::class, 'index'])
+        ->name('index');
+
+    Route::get('/create', [VendorPayoutController::class, 'create'])
+        ->name('create');
+
+    Route::post('/', [VendorPayoutController::class, 'store'])
+        ->name('store');
+
+    Route::post('/{payout}/paid', [VendorPayoutController::class, 'markPaid'])
+        ->name('paid');
+});
+
+
+
+});
+
+Route::middleware(['auth', 'vendor'])
+    ->prefix('vendor')
+    ->name('vendor.')
+    ->group(function () {
+
+    Route::get('/dashboard', [VendorDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::resource('products', VendorProductController::class);
+
+    Route::get('/orders', [VendorOrderController::class, 'index'])
+        ->name('orders.index');
+
+    Route::get('/payouts', [VendorPayoutController::class, 'index'])
+        ->name('payouts.index');
+
+    Route::get('/profile', [VendorProfileController::class, 'index'])
+        ->name('profile');
+});
+
+
+
 
 require __DIR__.'/auth.php';

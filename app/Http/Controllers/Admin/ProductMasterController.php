@@ -19,6 +19,7 @@ use App\Models\ProductPrice;
 use App\Models\ProductImage;
 use App\Models\Coupon;
 use App\Helpers\MyHelper;
+use Yajra\DataTables\Facades\DataTables;
 
 
 
@@ -32,75 +33,125 @@ class ProductMasterController extends Controller
     /**
      * Display a listing of products.
      */
-    public function index()
-    {
-        $products = Product::with(['category:id,name','variants.stocks' ])->orderBy('created_at', 'desc')->get(); // Load variants along with their stocks
-        return view('manage-product.product-master.index', compact('products'));
+   public function index()
+{
+    $query = Product::with(['category:id,name','variants.stocks'])
+        ->orderBy('created_at', 'desc');
+
+    // ✅ If vendor logged in → filter
+    if (auth()->user()->user_type === 'vendor') {
+        $query->where('vendor_id', auth()->user()->vendor_id);
     }
+
+    $products = $query->get();
+
+    return view('manage-product.product-master.index', compact('products'));
+}
+
     
     
     public function datatable()
-    {
-        $baseQuery = Product::with(['category', 'variants.stocks'])
-        ->orderBy('created_at', 'desc');
+{
+    // ✅ Base query with eager loading
+    $query = Product::with(['category', 'variants.stocks', 'vendor']);
 
-        $recordsTotal = (clone $baseQuery)->count();
+    // ✅ Filter for vendors only
+    if (auth()->user()->user_type === 'vendor') {
+        $query->where('vendor_id', auth()->user()->vendor_id);
+    }
 
-        $search = request()->input('search.value');
-        if (!empty($search)) {
-            $baseQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                ->orWhere('sku', 'like', '%' . $search . '%');
-            });
-        }
-
-        $recordsFiltered = (clone $baseQuery)->count();
-
-        $start = (int) request()->input('start', 0);
-        $length = (int) request()->input('length', 25);
-
-        $products = $baseQuery->skip($start)->take($length)->get();
-
-        $data = $products->map(function ($p) {
-            return [
-                'product' => '
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-box-seam text-primary"></i>
-                    <div>
+    return DataTables::of($query)
+        ->addColumn('product', function ($p) {
+            return '<div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-box-seam text-primary"></i>
+                        <div>
                             <strong>' . $p->name . '</strong>
                             <div class="small text-muted">#PRD-' . $p->id . '</div>
                         </div>
-                    </div>
-                ',
-                'category' => $p->category->name ?? '-',
-                'sku' => $p->sku ?? '-',
-                'variants' => '<span class="badge bg-secondary">' . $p->variant_count . ' variants</span>',
-                'stock' => '<span class="badge bg-light text-dark">' . $p->total_stock . ' units</span>',
-                'status' => '<span class="badge ' . ($p->status === 'active' ? 'bg-soft-success text-success' : 'bg-soft-warning text-warning') . '">'
-                    . ucfirst($p->status) . '</span>',
-                'actions' => '
-                <div class="d-flex justify-content-end gap-2">
-                        <a href="' . route('manage-product.product-master.edit', $p->id) . '" class="btn btn-sm btn-link text-primary">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                        <form method="POST" action="' . route('manage-product.product-master.destroy', $p->id) . '">
-                            ' . csrf_field() . method_field("DELETE") . '
-                        <button class="btn btn-sm btn-link text-danger">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-                ',
-            ];
-        });
+                    </div>';
+        })
+        ->addColumn('category', function($p) {
+            return $p->category->name ?? '-';
+        })
+        ->addColumn('variants', function($p) {
+            $count = $p->variants ? $p->variants->count() : 0;
+            return '<span class="badge bg-secondary">' . $count . ' variants</span>';
+        })
+        ->addColumn('stock', function($p) {
+            $stock = 0;
+            if ($p->variants) {
+                foreach ($p->variants as $v) {
+                    $stock += $v->stocks->sum('quantity'); // sum stock for each variant
+                }
+            }
+            return '<span class="badge bg-light text-dark">' . $stock . ' units</span>';
+        })
+        ->addColumn('status', function($p) {
+            $status = $p->approval_status ?? 'pending';
+            $class = $status === 'approved' ? 'bg-success' :
+                     ($status === 'rejected' ? 'bg-danger' : 'bg-warning');
+            $reason = $status === 'rejected' && $p->rejection_reason ? '<div class="small text-danger">'.$p->rejection_reason.'</div>' : '';
+            return '<span class="badge '.$class.'">'. ucfirst($status) .'</span>' . $reason;
+        })
+        ->addColumn('actions', function($p) {
 
-        return response()->json([
-            'draw' => (int) request()->input('draw', 1),
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data' => $data,
+            $approveBtn = '';
+            $rejectBtn = '';
+
+            // ✅ Only Admin can approve/reject
+            if (auth()->user()->user_type !== 'vendor' && ($p->approval_status ?? 'pending') === 'pending') {
+                $approveBtn = '<form method="POST" action="'.route('manage-product.product-master.approve', $p->id).'" class="d-inline approveForm">'.csrf_field().'<button class="btn btn-sm btn-success"><i class="bi bi-check-circle"></i></button></form>';
+                $rejectBtn  = '<button class="btn btn-sm btn-danger btn-reject" data-url="'.route('manage-product.product-master.reject', $p->id).'"><i class="bi bi-x-circle"></i></button>';
+            }
+
+            $editBtn = '<a href="'.route('manage-product.product-master.edit', $p->id).'" class="btn btn-sm btn-link text-primary"><i class="bi bi-pencil"></i></a>';
+
+            $deleteBtn = '';
+            // ✅ Vendor can delete only their own products
+            if (auth()->user()->user_type !== 'vendor' || ($p->vendor_id === auth()->user()->vendor_id)) {
+                $deleteBtn = '<form method="POST" action="'.route('manage-product.product-master.destroy', $p->id).'" class="d-inline">'.csrf_field().method_field('DELETE').'<button class="btn btn-sm btn-link text-danger"><i class="bi bi-trash"></i></button></form>';
+            }
+
+            return $approveBtn . ' ' . $rejectBtn . ' ' . $editBtn . ' ' . $deleteBtn;
+        })
+        ->rawColumns(['product', 'variants', 'stock', 'status', 'actions'])
+        ->make(true);
+}
+
+
+ public function approve(Product $product)
+    {
+        $product->update([
+            'approval_status' => 'approved',
+            'status'          => 'active',
+            'approved_at'     => now(),
+            'approved_by'     => auth()->id(),
+            'rejection_reason'=> null,
         ]);
+
+        return back()->with('success', 'Product approved successfully');
     }
+
+    /**
+     * Reject product with reason.
+     */
+    public function reject(Request $request, Product $product)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $product->update([
+            'approval_status'  => 'rejected',
+            'status'           => 'inactive',
+            'rejection_reason' => $request->rejection_reason,
+            'approved_by'      => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Product rejected successfully');
+    }
+
+
 
     public function discounts($productId)
     {
@@ -330,7 +381,7 @@ class ProductMasterController extends Controller
                 'height'          => 'nullable|numeric',
                 'min_order_quantity' => 'nullable|integer|min:1',
                 'status'          => 'nullable|in:active,inactive',
-                'thumbnail_image' => 'nullable|image',
+                'thumbnail_image' => 'nullable|image|max:2048',
             ]);
             if ($request->hasFile('thumbnail_image')) {
                 if ($product->thumbnail_image) {

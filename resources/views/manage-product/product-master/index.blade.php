@@ -29,7 +29,6 @@
                 <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                     <i class="bi bi-funnel me-2"></i>Filter
                 </button>
-
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li class="dropdown-item-text">
                         <div class="form-check">
@@ -75,7 +74,7 @@
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0" id="productTable">
                     <thead>
                         <tr>
                             <th>Product</th>
@@ -88,57 +87,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($products as $product)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-box-seam text-primary"></i>
-                                    <div>
-                                        <strong>{{ $product->name }}</strong>
-                                        <div class="small text-muted">#PRD-{{ $product->id }}</div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td>{{ $product->category->name ?? '-' }}</td>
-
-                            <td>{{ $product->sku ?? '-' }}</td>
-
-                            <td>
-                                <span class="badge bg-secondary">
-                                    {{ $product->variant_count }} variants
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="badge bg-light text-dark">
-                                    {{ $product->total_stock }} units
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="badge {{ $product->status === 'active' ? 'bg-soft-success text-success' : 'bg-soft-warning text-warning' }}">
-                                    {{ ucfirst($product->status) }}
-                                </span>
-                            </td>
-
-                            <td class="text-end">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('manage-product.product-master.edit', $product->id) }}" class="btn btn-sm btn-link text-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-
-                                    <form action="{{ route('manage-product.product-master.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete this product?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-link text-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
+                        {{-- DataTables will load data here --}}
                     </tbody>
                 </table>
             </div>
@@ -160,25 +109,48 @@
                 <div id="product_paginate" class="d-flex gap-1"></div>
             </div>
         </div>
+    </div>
+</div>
 
+{{-- ================= REJECT MODAL ================= --}}
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="rejectForm" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejection_reason" class="form-label">Reason for Rejection</label>
+                        <textarea name="rejection_reason" id="rejection_reason" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
 <script>
     $(document).ready(function() {
 
-        let table = $('.table').DataTable({
+        let table = $('#productTable').DataTable({
             processing: true
             , serverSide: true
-            , ajax: "{{ route('manage-product.product-master.datatable') }}", // create this route
-            dom: 'rt'
-            , pageLength: 25
-            , pagingType: 'simple_numbers',
-
-            columns: [{
+            , ajax: "{{ route('manage-product.product-master.datatable') }}"
+            , columns: [{
                     data: 'product'
                 }
                 , {
@@ -200,13 +172,12 @@
                     data: 'actions'
                     , orderable: false
                 }
-            ],
-
-            drawCallback: function() {
+            ]
+            , pageLength: 25
+            , dom: 'rt'
+            , drawCallback: function() {
                 let info = this.api().page.info();
-                $('#productTableInfo').html(
-                    `Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal}`
-                );
+                $('#productTableInfo').html(`Showing ${info.start + 1} to ${info.end} of ${info.recordsTotal}`);
                 updatePagination(this.api());
             }
         });
@@ -219,16 +190,13 @@
             let info = api.page.info();
             let html = '';
 
-            html += `<button class="btn btn-sm btn-outline-secondary"
-            ${info.page === 0 ? 'disabled' : 'data-page="prev"'}>Previous</button>`;
+            html += `<button class="btn btn-sm btn-outline-secondary" ${info.page === 0 ? 'disabled' : 'data-page="prev"'}>Previous</button>`;
 
             for (let i = 0; i < info.pages; i++) {
-                html += `<button class="btn btn-sm ${i === info.page ? 'btn-primary' : 'btn-outline-secondary'}"
-                data-page="${i}">${i + 1}</button>`;
+                html += `<button class="btn btn-sm ${i === info.page ? 'btn-primary' : 'btn-outline-secondary'}" data-page="${i}">${i + 1}</button>`;
             }
 
-            html += `<button class="btn btn-sm btn-outline-secondary"
-            ${info.page + 1 >= info.pages ? 'disabled' : 'data-page="next"'}>Next</button>`;
+            html += `<button class="btn btn-sm btn-outline-secondary" ${info.page + 1 >= info.pages ? 'disabled' : 'data-page="next"'}>Next</button>`;
 
             $('#product_paginate').html(html);
         }
@@ -240,11 +208,18 @@
             else if (!isNaN(page)) table.page(page).draw('page');
         });
 
+        // REJECT BUTTON HANDLER
+        $(document).on('click', '.btn-reject', function() {
+            let url = $(this).data('url');
+            $('#rejectForm').attr('action', url);
+            $('#rejectModal').modal('show');
+        });
+
     });
 
 </script>
-
 @endsection
 
 @section('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 @endsection

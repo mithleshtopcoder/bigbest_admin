@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InvoiceService;
-use App\Services\NotificationService;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -105,39 +103,6 @@ class OrderStatusController extends Controller
         $order->update([
             'status' => $request->status,
         ]);
-
-        Log::info('Order status updated (admin)', [
-            'order_id' => $order->id,
-            'order_number' => $order->order_number,
-            'previous_status' => $order->getOriginal('status'),
-            'new_status' => $request->status,
-            'customer_id' => $order->customer_id,
-        ]);
-
-        if ($order->customer_id) {
-            $statusLabel = str_replace('_', ' ', $request->status);
-            $message = "Your order #{$order->order_number} status updated to {$statusLabel}.";
-
-            Log::info('Triggering order status notification', [
-                'order_id' => $order->id,
-                'customer_id' => $order->customer_id,
-                'status' => $request->status,
-            ]);
-
-            NotificationService::send(
-                $order->customer_id,
-                'order',
-                "Order {$statusLabel}",
-                $message,
-                ['order_id' => $order->id, 'status' => $request->status],
-                "/orders/{$order->id}"
-            );
-        } else {
-            Log::warning('Order status updated but no customer_id', [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-            ]);
-        }
 
         return redirect()->back()
             ->with('success', 'Order status updated successfully.');

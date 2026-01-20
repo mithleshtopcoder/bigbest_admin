@@ -25,7 +25,7 @@ class AuthController extends Controller
             'last_name' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:customers',
             'phone' => 'required|string|max:20|unique:customers',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
         ]);
@@ -110,9 +110,6 @@ class AuthController extends Controller
         if ($request->device_token) {
             $customer->update(['device_token' => $request->device_token]);
         }
-        if ($request->device_id) {
-            $customer->update(['device_id' => $request->device_id]);
-        }
         if ($request->fcm_token) {
             $customer->update(['fcm_token' => $request->fcm_token]);
         }
@@ -139,53 +136,6 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'data' => $customer->makeHidden(['password', 'remember_token'])
-        ], 200);
-    }
-
-    /**
-     * Update customer device / FCM token
-     */
-    public function updateDeviceToken(Request $request)
-    {
-        $customer = $request->user();
-
-        $validator = Validator::make($request->all(), [
-            'device_token' => 'nullable|string',
-            'device_id' => 'nullable|string',
-            'fcm_token' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        if (!$request->device_token && !$request->device_id && !$request->fcm_token) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token is required',
-            ], 422);
-        }
-
-        $update = [];
-        if ($request->device_token) {
-            $update['device_token'] = $request->device_token;
-        }
-        if ($request->device_id) {
-            $update['device_id'] = $request->device_id;
-        }
-        if ($request->fcm_token) {
-            $update['fcm_token'] = $request->fcm_token;
-        }
-
-        $customer->update($update);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Token updated successfully',
         ], 200);
     }
 

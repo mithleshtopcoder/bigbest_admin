@@ -104,7 +104,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('customer')->group(function () {
             Route::get('/profile', [AuthController::class, 'profile']);
-            Route::post('/device-token', [AuthController::class, 'updateDeviceToken']);
             Route::put('/profile', [AuthController::class, 'updateProfile']);
             Route::post('/photo', [AuthController::class, 'updatePhoto']);
             Route::post('/change-password', [AuthController::class, 'changePassword']);
