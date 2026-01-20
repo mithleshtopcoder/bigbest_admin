@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Notification;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class NotificationEvent implements ShouldBroadcast
+{
+    use Dispatchable, SerializesModels;
+
+    public $notification;
+
+    public function __construct(Notification $notification)
+    {
+        $this->notification = $notification;
+    }
+
+    public function broadcastOn()
+    {
+        // Send to private channel of the specific customer
+        $channel = 'notifications.' . $this->notification->customer_id;
+
+        Log::info('Broadcasting notification event', [
+            'notification_id' => $this->notification->id,
+            'customer_id' => $this->notification->customer_id,
+            'channel' => $channel,
+        ]);
+
+        return new PrivateChannel($channel);
+    }
+
+    public function broadcastWith()
+    {
+        // Data sent to frontend
+        $payload = [
+            'id' => $this->notification->id,
+            'title' => $this->notification->title,
+            'message' => $this->notification->message,
+            'data' => $this->notification->data,
+            'type' => $this->notification->type,
+            'sent_at' => $this->notification->sent_at,
+            'is_read' => $this->notification->is_read,
+        ];
+
+        Log::info('Notification event payload prepared', [
+            'notification_id' => $this->notification->id,
+            'customer_id' => $this->notification->customer_id,
+        ]);
+
+        return $payload;
+    }
+}

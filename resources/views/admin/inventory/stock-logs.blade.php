@@ -1,0 +1,18 @@
+@extends('layouts.app')
+
+@section('title', 'Stock Logs')
+@section('page-title', 'Stock Logs')
+@section('page-description', 'View stock movement history')
+
+@section('content')
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">Stock Logs</h3>
+            <p class="text-sm text-gray-500 mt-1">Movement history</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Store</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th></tr></thead><tbody class="bg-white divide-y divide-gray-200"><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-01-20 10:30</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gold Ring 22K</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Stock In</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">+50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mumbai Central</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ramesh Kumar</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">PO-2024-001</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">View</a></td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-01-20 09:15</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gold Chain 24K</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Stock Out</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">-5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Delhi NCR</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sunita Devi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">SALE-2024-015</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">View</a></td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-01-19 16:45</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Silver Bracelet</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Adjustment</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">-2</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Bangalore East</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mohammed Ali</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">ADJ-2024-003</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">View</a></td></tr></tbody></table></div></div>
+</div>
+@endsection

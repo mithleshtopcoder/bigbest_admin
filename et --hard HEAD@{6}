@@ -1,0 +1,32 @@
+[33m6fa9f05[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrstc-mithlesh[m[33m)[m HEAD@{0}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33m23943ce[m[33m ([m[1;31morigin/rstc-iqarar[m[33m, [m[1;32mrstc-iqarar[m[33m)[m HEAD@{1}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m6fa9f05[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrstc-mithlesh[m[33m)[m HEAD@{2}: reset: moving to HEAD~2
+[33m1beb8f7[m HEAD@{3}: reset: moving to HEAD~1
+[33m0e91542[m HEAD@{4}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33m23943ce[m[33m ([m[1;31morigin/rstc-iqarar[m[33m, [m[1;32mrstc-iqarar[m[33m)[m HEAD@{5}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m0e91542[m HEAD@{6}: commit (merge): Merge branch 'rstc-iqarar' into rstc-mithlesh
+[33m1beb8f7[m HEAD@{7}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33m23943ce[m[33m ([m[1;31morigin/rstc-iqarar[m[33m, [m[1;32mrstc-iqarar[m[33m)[m HEAD@{8}: pull: Fast-forward
+[33m2350e31[m HEAD@{9}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m1beb8f7[m HEAD@{10}: commit: manage user section and role section
+[33m56ec907[m HEAD@{11}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33m2350e31[m HEAD@{12}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m56ec907[m HEAD@{13}: commit (merge): Merge branch 'rstc-iqarar' into rstc-mithlesh
+[33m6fa9f05[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrstc-mithlesh[m[33m)[m HEAD@{14}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33m2350e31[m HEAD@{15}: pull: Fast-forward
+[33me9c5d7d[m HEAD@{16}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m6fa9f05[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrstc-mithlesh[m[33m)[m HEAD@{17}: commit: manage user section
+[33m772ac00[m HEAD@{18}: commit (merge): Merge branch 'rstc-iqarar' into rstc-mithlesh
+[33m3bf5471[m HEAD@{19}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33me9c5d7d[m HEAD@{20}: pull: Fast-forward
+[33mfd41566[m HEAD@{21}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33m3bf5471[m HEAD@{22}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33mfd41566[m HEAD@{23}: checkout: moving from main to rstc-iqarar
+[33ma7a15e9[m[33m ([m[1;32mmain[m[33m)[m HEAD@{24}: checkout: moving from rstc-mithlesh to main
+[33m3bf5471[m HEAD@{25}: commit: initial setup
+[33mfd41566[m HEAD@{26}: merge rstc-iqarar: Fast-forward
+[33ma7a15e9[m[33m ([m[1;32mmain[m[33m)[m HEAD@{27}: checkout: moving from rstc-iqarar to rstc-mithlesh
+[33mfd41566[m HEAD@{28}: pull: Fast-forward
+[33m2b61075[m HEAD@{29}: checkout: moving from rstc-mithlesh to rstc-iqarar
+[33ma7a15e9[m[33m ([m[1;32mmain[m[33m)[m HEAD@{30}: checkout: moving from main to rstc-mithlesh
+[33ma7a15e9[m[33m ([m[1;32mmain[m[33m)[m HEAD@{31}: clone: from https://github.com/rstc-iffat/real_gold_farming.git

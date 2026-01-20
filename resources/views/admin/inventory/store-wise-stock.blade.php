@@ -1,0 +1,18 @@
+@extends('layouts.app')
+
+@section('title', 'Store-Wise Stock')
+@section('page-title', 'Store-Wise Stock')
+@section('page-description', 'View stock levels by store')
+
+@section('content')
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">Store-Wise Stock</h3>
+            <p class="text-sm text-gray-500 mt-1">Stock by store</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mumbai Central</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delhi NCR</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bangalore East</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Stock</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th></tr></thead><tbody class="bg-white divide-y divide-gray-200"><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gold Ring 22K</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">56</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">55</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">156</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹24,33,600</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gold Chain 24K</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">32</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">28</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">29</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">89</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹25,72,100</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Silver Bracelet</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">78</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">82</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">74</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">234</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹19,89,000</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gold Earrings 18K</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">15</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">18</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">12</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹5,53,500</td></tr><tr class="hover:bg-gray-50"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Necklace Set</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">12</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹5,47,200</td></tr></tbody></table></div></div>
+</div>
+@endsection
