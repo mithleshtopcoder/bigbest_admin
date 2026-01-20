@@ -12,7 +12,8 @@ return new class extends Migration
    public function up()
 {
     Schema::table('users', function ($table) {
-        $table->string('user_type')->default('customer')->after('status')->comment('Type of user: admin, vendor, customer');
+         $table->enum('user_type', ['user', 'admin'])->default('user');
+         $table->enum('is_access', ['admin', 'vendor'])->default('user');
     });
 }
 
@@ -20,6 +21,7 @@ public function down()
 {
     Schema::table('users', function ($table) {
         $table->dropColumn('user_type');
+        $table->dropColumn('is_access');
     });
 }
 

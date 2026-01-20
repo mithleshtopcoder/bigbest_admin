@@ -45,19 +45,6 @@ class VendorController extends Controller
 
     DB::transaction(function () use ($request, $status, $vendorUid) {
 
-        // 1️⃣ Create vendor
-        $vendor = Vendor::create([
-            'vendor_uid' => $vendorUid,
-            'name'       => $request->name,
-            'email'      => $request->email,
-            'phone'      => $request->phone,
-            'password'   => bcrypt($request->password),
-            'store_name' => $request->store_name,
-            'address'    => $request->address,
-            'pan_number' => $request->pan_number,
-            'gst_number' => $request->gst_number,
-            'status'     => $status,
-        ]);
 
         // 2️⃣ Upload KYC files
         $kycFiles = [
@@ -86,7 +73,7 @@ class VendorController extends Controller
             'password'      => bcrypt($request->password),
             'status'        => $status === 'approved' ? 1 : 0,
             'user_type'     => 'vendor',
-            'vendor_id'     => $vendor->id, // ✅ LINKED HERE
+            'vendor_id'     => $vendorUid, // ✅ LINKED HERE
         ]);
     });
 
