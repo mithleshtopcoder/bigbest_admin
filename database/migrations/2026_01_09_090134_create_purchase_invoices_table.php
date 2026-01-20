@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('purchase_invoices', function (Blueprint $table) {
+            $table->id();
+            $table->string('invoice_number')->unique();
+            $table->foreignId('purchase_order_id')->nullable()->constrained('purchase_orders')->onDelete('set null');
+            $table->foreignId('purchase_receipt_id')->nullable()->constrained('purchase_receipts')->onDelete('set null');
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
+            $table->foreignId('store_id')->constrained('stores')->onDelete('restrict');
+            $table->enum('status', ['draft', 'pending', 'approved', 'paid', 'partially_paid', 'cancelled'])->default('draft');
+            $table->date('invoice_date');
+            $table->date('due_date')->nullable();
+            $table->string('supplier_invoice_number')->nullable();
+            $table->text('notes')->nullable();
+            $table->text('terms_conditions')->nullable();
+            $table->decimal('subtotal', 12, 2)->default(0.00);
+            $table->decimal('tax_amount', 12, 2)->default(0.00);
+            $table->decimal('discount_amount', 12, 2)->default(0.00);
+            $table->decimal('shipping_charge', 10, 2)->default(0.00);
+            $table->decimal('total_amount', 12, 2)->default(0.00);
+            $table->decimal('paid_amount', 12, 2)->default(0.00);
+            $table->decimal('pending_amount', 12, 2)->default(0.00);
+            $table->enum('payment_status', ['pending', 'partially_paid', 'paid', 'overdue'])->default('pending');
+            $table->foreignId('created_by')->constrained('users')->onDelete('restrict');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('approved_at')->nullable();
+            $table->integer('total_items')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
+            
+            $table->index('supplier_id');
+            $table->index('store_id');
+            $table->index('status');
+            $table->index('invoice_date');
+            $table->index('payment_status');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('purchase_invoices');
+    }
+};
