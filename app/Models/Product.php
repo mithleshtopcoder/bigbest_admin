@@ -158,9 +158,8 @@ class Product extends Model
         return $this->hasMany(ProductReview::class)->where('status', 'approved');
     }
 
- public function vendor()
-{
-    return $this->belongsTo(User::class, 'vendor_id', 'id')
-                ->where('user_type', 'vendor'); // ensures only vendor users
-}
+public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id', 'vendor_id');
+    }
 }

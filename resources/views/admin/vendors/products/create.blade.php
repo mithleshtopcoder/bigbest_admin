@@ -30,7 +30,7 @@
             </div>
             <div class="card-body">
 
-                <form method="POST" action="{{ route('manage-product.product-master.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('vendor.products.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="row ps-2">
                         <div class="col-md-4">

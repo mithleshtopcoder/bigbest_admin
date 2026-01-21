@@ -714,9 +714,49 @@ Route::middleware(['auth', 'vendor'])
     ->name('vendor.')
     ->group(function () {
 
-    Route::resource('products', VendorProductController::class);
+        // Dashboard
+        Route::get('/dashboard', [VendorDashboardController::class, 'index'])
+            ->name('dashboard');
 
-});
+        // List products
+        Route::get('/products', [VendorProductController::class, 'index'])
+            ->name('products.index');
+
+        // Show create product form
+        Route::get('/products/create', [VendorProductController::class, 'create'])
+            ->name('products.create');
+
+        // Store new product
+        Route::post('/products', [VendorProductController::class, 'store'])
+            ->name('products.store');
+
+        // Show single product
+        Route::get('/products/{product}', [VendorProductController::class, 'show'])
+            ->name('products.show');
+
+        // Show edit form
+        Route::get('/products/{product}/edit', [VendorProductController::class, 'edit'])
+            ->name('products.edit');
+
+        // Update product
+        Route::put('/products/{product}', [VendorProductController::class, 'update'])
+            ->name('products.update');
+
+        Route::put('/products/{product}', [VendorProductController::class, 'updateinfo'])
+            ->name('products.updateinfo');
+
+        // Delete product
+        Route::delete('/products/{product}', [VendorProductController::class, 'destroy'])
+            ->name('products.destroy');
+        Route::get('/orders', [VendorOrderController::class, 'index'])
+            ->name('orders.index');
+        Route::get('/payouts', [VendorPayoutController::class, 'index'])
+            ->name('payouts.index');
+
+        Route::get('/profile', [VendorProfileController::class, 'index'])
+            ->name('profile');
+    });
+
 
 
 
