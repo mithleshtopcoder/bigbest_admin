@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_balances', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_variant_id')->constrained('product_variants')->onDelete('cascade');
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->integer('available_quantity')->default(0); // Available for sale

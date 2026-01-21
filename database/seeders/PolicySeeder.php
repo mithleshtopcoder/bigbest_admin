@@ -17,14 +17,14 @@ class PolicySeeder extends Seeder
             [
                 'type' => 'terms_conditions',
                 'title' => 'Terms and Conditions',
-                'content' => 'By using our services, you agree to our terms and conditions. All products are organic and certified. We ensure quality and freshness in every delivery. R G Organic Mart reserves the right to modify these terms at any time.',
+                'content' => 'By using our services, you agree to our terms and conditions. All products are organic and certified. We ensure quality and freshness in every delivery. Big Best reserves the right to modify these terms at any time.',
                 'is_active' => true,
                 'sort_order' => 1,
             ],
             [
                 'type' => 'privacy_policy',
                 'title' => 'Privacy Policy',
-                'content' => 'We respect your privacy. Your personal information is securely stored and will never be shared with third parties without your consent. R G Organic Mart is committed to protecting your data and ensuring your privacy.',
+                'content' => 'We respect your privacy. Your personal information is securely stored and will never be shared with third parties without your consent. Big Best is committed to protecting your data and ensuring your privacy.',
                 'is_active' => true,
                 'sort_order' => 2,
             ],
@@ -45,7 +45,7 @@ class PolicySeeder extends Seeder
             [
                 'type' => 'about_us',
                 'title' => 'About Us',
-                'content' => 'R G Organic Mart is committed to providing the freshest organic produce to our customers. We work directly with local farmers to bring you the best quality vegetables, fruits, and food products. Our mission is to make organic food accessible to everyone.',
+                'content' => 'Big Best is committed to providing the freshest organic produce to our customers. We work directly with local farmers to bring you the best quality vegetables, fruits, and food products. Our mission is to make organic food accessible to everyone.',
                 'is_active' => true,
                 'sort_order' => 5,
             ],

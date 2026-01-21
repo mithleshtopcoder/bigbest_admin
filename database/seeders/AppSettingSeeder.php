@@ -16,7 +16,7 @@ class AppSettingSeeder extends Seeder
         AppSetting::updateOrCreate(
             ['id' => 1],
             [
-                'company_name' => 'R G Organic Mart',
+                'company_name' => 'Big Best',
                 'company_title' => 'Fresh Organic Products - Farm to Door',
                 'logo' => 'https://via.placeholder.com/400x100/4CAF50/FFFFFF?text=R+G+Organic+Mart',
                 'small_logo' => 'https://via.placeholder.com/100x100/4CAF50/FFFFFF?text=RGOM',
@@ -35,7 +35,7 @@ class AppSettingSeeder extends Seeder
                 'youtube_url' => 'https://youtube.com/@rgorganicmart',
                 'linkedin_url' => 'https://linkedin.com/company/rgorganicmart',
                 'whatsapp_number' => '+919876543210',
-                'about_us' => 'R G Organic Mart is committed to providing the freshest organic produce to our customers. We work directly with local farmers to bring you the best quality vegetables, fruits, and food products.',
+                'about_us' => 'Big Best is committed to providing the freshest organic produce to our customers. We work directly with local farmers to bring you the best quality vegetables, fruits, and food products.',
                 'min_order_amount' => 100.00,
                 'delivery_charge' => 50.00,
                 'free_delivery_threshold' => 500.00,

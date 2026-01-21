@@ -46,6 +46,7 @@ class ProductSeeder extends Seeder
         // Product 1: Organic Spinach
         $spinach = Product::create([
             'name' => 'Fresh Organic Spinach',
+            'user_id' => 1,
             'slug' => 'fresh-organic-spinach',
             'sku' => 'PROD001',
             'description' => 'Fresh organic spinach leaves, rich in iron and vitamins. Harvested daily from certified organic farms.',
@@ -132,6 +133,7 @@ class ProductSeeder extends Seeder
         // Product 2: Organic Carrots
         $carrots = Product::create([
             'name' => 'Fresh Organic Carrots',
+            'user_id' => 1,
             'slug' => 'fresh-organic-carrots',
             'sku' => 'PROD002',
             'description' => 'Sweet and crunchy organic carrots, rich in beta-carotene. Farm fresh and pesticide-free.',
@@ -206,6 +208,7 @@ class ProductSeeder extends Seeder
         // Product 3: Organic Tomatoes
         $tomatoes = Product::create([
             'name' => 'Fresh Organic Tomatoes',
+            'user_id' => 1,
             'slug' => 'fresh-organic-tomatoes',
             'sku' => 'PROD003',
             'description' => 'Juicy and flavorful organic tomatoes, perfect for salads and cooking. Locally sourced from organic farms.',
@@ -278,6 +281,7 @@ class ProductSeeder extends Seeder
         // Product 4: Organic Oranges
         $oranges = Product::create([
             'name' => 'Fresh Organic Oranges',
+            'user_id' => 1,
             'slug' => 'fresh-organic-oranges',
             'sku' => 'PROD004',
             'description' => 'Sweet and juicy organic oranges, packed with Vitamin C. Perfect for daily nutrition.',
@@ -351,6 +355,7 @@ class ProductSeeder extends Seeder
         // Product 5: Organic Mangoes
         $mangoes = Product::create([
             'name' => 'Premium Organic Mangoes',
+            'user_id' => 1,
             'slug' => 'premium-organic-mangoes',
             'sku' => 'PROD005',
             'description' => 'Sweet and aromatic organic mangoes, the king of fruits. Seasonal and handpicked for quality.',

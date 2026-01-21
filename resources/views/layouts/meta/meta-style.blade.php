@@ -24,9 +24,9 @@
         --sidebar-width-mini: 70px;
         --header-height: 60px;
         --primary-color: #0d6efd;
-        --sidebar-bg: #1a5f3f;
-        --sidebar-hover: #2d7a5a;
-        --sidebar-dark-green: #155d41;
+        --sidebar-bg:rgb(159, 19, 19);
+        --sidebar-hover:rgb(157, 19, 19);
+        --sidebar-dark-green:rgb(175, 12, 12);
     }
 
     html,
@@ -95,9 +95,9 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         min-height: var(--header-height);
-        background-color: rgb(20 84 58);
+        background-color: white;
         z-index: 10;
     }
 
@@ -119,7 +119,7 @@
     }
 
     .sidebar-logo {
-        max-height: 80px;
+        max-height: 100px;
         width: auto;
         flex-shrink: 0;
         transition: all 0.3s ease;
@@ -169,13 +169,13 @@
     }
 
     .sidebar-menu .menu-link.active {
-        background-color: rgb(5 69 43);
+        /* background-color: rgb(110 1 1); */
         color: #fff;
         border-left: 3px solid #fff;
     }
 
     .sidebar-menu .submenu .menu-link.active {
-        background-color: rgb(64 58 1);
+        background-color: rgb(121 1 2);
         color: #fff;
         border-left: 3px solid #fff;
     }
@@ -224,7 +224,7 @@
         list-style: none;
         padding: 0;
         margin: 0;
-        background-color: rgb(221 193 8 / 83%);
+        background-color: rgb(70 2 2 / 83%);
         display: none;
         overflow: hidden;
         max-height: 0;
@@ -499,8 +499,8 @@
     }
     .form-label{
         height: 28px;
-        background: rgb(31 121 85 / 25%);
-        border: 1px solid rgb(19 84 58 / 25%);
+        background: rgb(121 31 31 / 17%);
+        border: 1px solid rgb(84 19 19 / 14%);
 
     }
     .row-p{
@@ -700,20 +700,20 @@
     color: #ffffff;
     background-color: var(--bs-nav-tabs-link-active-bg);
     border-color: var(--bs-nav-tabs-link-active-border-color);
-    background: #218c62;
-    border-bottom: 1px solid #228c62;
+    background: #9c0e0e;
+    border-bottom: 1px solid #9c0e0e;
 }
 .nav-tabs-custom-style{
-    border-bottom: 1px solid #228c62;
+    border-bottom: 1px solid #9c0e0e;
 }
 .nav-tabs .nav-link {
-        background: rgb(220 168 11 / 46%);
+        background: rgb(255 86 86);
     border-top: 1px solid rgb(232, 232, 232);
     border-left: 1px solid rgb(232, 232, 232);
     border-right: 1px solid rgb(232, 232, 232);
     padding: 2px 12px;
     font-size: 15px;
-    color: #000000;
+    color:rgb(255, 255, 255);
 }
 
 </style>

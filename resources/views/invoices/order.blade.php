@@ -144,7 +144,7 @@
     <div class="invoice-container">
         <div class="header">
             <div class="company-info">
-                <h1>{{ $store->name ?? 'RG Organic Mart' }}</h1>
+                <h1>{{ $store->name ?? 'Big Best' }}</h1>
                 <p>{{ $store->address ?? '' }}</p>
                 <p>{{ $store->city ?? '' }}, {{ $store->state ?? '' }} - {{ $store->pincode ?? '' }}</p>
                 <p>Phone: {{ $store->phone ?? '' }}</p>

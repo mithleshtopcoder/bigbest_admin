@@ -9,24 +9,10 @@ return new class extends Migration {
     {
         Schema::table('products', function (Blueprint $table) {
 
-            $table->enum('approval_status', ['pending', 'approved', 'rejected'])
-                  ->default('pending')
-                  ->after('status');
-
-            $table->text('rejection_reason')
-                  ->nullable()
-                  ->after('approval_status');
-
-            $table->timestamp('approved_at')
-                  ->nullable()
-                  ->after('rejection_reason');
-
-            $table->unsignedBigInteger('approved_by')
-                  ->nullable()
-                  ->after('approved_at');
-
-            // Optional FK (safe even if you skip)
-            // $table->foreign('approved_by')->references('id')->on('users')->nullOnDelete();
+            $table->enum('approval_status', ['pending', 'approved', 'rejected'])->default('pending')->after('status');
+            $table->text('rejection_reason')->nullable()->after('approval_status');
+            $table->timestamp('approved_at')->nullable()->after('rejection_reason');
+            $table->unsignedBigInteger('approved_by')->nullable()->after('approved_at');
         });
     }
 

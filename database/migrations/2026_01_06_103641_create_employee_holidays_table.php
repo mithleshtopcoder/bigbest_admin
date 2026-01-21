@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_holidays', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->date('holiday_date');
             $table->text('description')->nullable();

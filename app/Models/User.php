@@ -22,6 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'uuid',
         'name',
+        'user_type', // user_type == admin or customer, customer == vendors
+        'is_access', // is_access == admin or user, vendors's user
         'vendor_id',
         'email',
         'password',

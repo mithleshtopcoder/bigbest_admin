@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="app-url" content="{{ config('app.url') }}">
     
-    <title>Login - {{ config('app.name', 'RG Organic Mart') }}</title>
+    <title>Login - {{ config('app.name', 'Big Best') }}</title>
     
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}">
@@ -23,14 +23,15 @@
     
     <style>
         :root {
-            --primary-green: #1a5f3f;
-            --dark-green: #155d41;
-            --light-green: #2d7a5a;
+            --primary-green:rgb(236 50 55);
+            --dark-green:rgba(145, 8, 8, 0.83);
+            --light-green:rgba(122, 45, 45, 0.82);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #1a5f3f 0%, #155d41 50%, #2d7a5a 100%);
+            {{-- background: linear-gradient(135deg, #1a5f3f 0%, #155d41 50%, #2d7a5a 100%); --}}
+            background: linear-gradient(135deg, #ec3237 0%,rgb(119, 10, 13) 50%, #ec3337 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -59,7 +60,7 @@
         }
 
         .login-right {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            background: linear-gradient(135deg, rgb(19 17 17 / 63%) 0%, rgb(255 1 1 / 19%) 100%);
             padding: 0;
             position: relative;
             overflow: hidden;
@@ -72,7 +73,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('{{ asset("images/login1.jpg") }}') center/cover;
+            background: url(https://img.freepik.com/free-photo/3d-rendering-cartoon-shopping-cart_23-2151680620.jpg?semt=ais_hybrid&w=740&q=80) center/cover;
             opacity: 0.3;
         }
 
@@ -197,6 +198,13 @@
         .input-group:focus-within .input-group-text {
             border-color: var(--primary-green);
         }
+        
+        .form-control {
+            height: 38px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+        }
     </style>
 </head>
 
@@ -207,11 +215,8 @@
                 <!-- Left Side - Login Form -->
                 <div class="col-lg-6 login-left">
                     <div class="logo-container text-center">
-                        <img src="{{ asset('images/logo21.png') }}" alt="Logo" class="img-fluid">
+                        <img src="https://bigbest.in/public/storage/settings/169494633011.png" alt="Logo" class="img-fluid">
                     </div>
-                    <h1 class="brand-title text-center">RG Organic Mart</h1>
-                    {{-- <p class="brand-subtitle text-center">Admin Panel</p> --}}
-
                     <h4 class="fw-bold mb-2 text-center">Login to your account</h4>
                     <p class="text-muted mb-4 text-center">Welcome back! Please login to access the admin panel.</p>
 

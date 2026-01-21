@@ -30,13 +30,13 @@
                                 <h2 class="fs-20 fw-bolder mb-4" style="font-size: 42px;
     font-family: cursive;
     text-shadow: 3px 3px 3px #d1b402;
-    color: #1a6708;">RG Organic Mart</h2>
+    color: #1a6708;">Big Best</h2>
                                 {{-- <h2 class="fs-20 fw-bolder mb-4" style="background: #FFFFFF;
 text-shadow: 0 1px #dabe11, -1px 0 #dabe11, -1px 2px #dabe11, -2px 1px #dabe11, -2px 3px #dabe11, -3px 2px #dabe11, -3px 4px #dabe11, -4px 3px #dabe11, -4px 5px #dabe11, -5px 4px #dabe11, -5px 6px #dabe11, -6px 5px #dabe11, -6px 7px #dabe11, -7px 6px #dabe11, -7px 8px #dabe11, -8px 7px #dabe11;
 color: #1a6708;
-background: #FFFFFF;font-size: 38px;">RG Organic Mart</h2> --}}
+background: #FFFFFF;font-size: 38px;">Big Best</h2> --}}
                                 <h4 class="fs-13 fw-bold mb-2">Login to your account</h4>
-                                <p class="fs-12 fw-medium text-muted">Welcome back! Please login to access the <strong>RG Organic Mart</strong> admin panel.</p>
+                                <p class="fs-12 fw-medium text-muted">Welcome back! Please login to access the <strong>Big Best</strong> admin panel.</p>
 
                                 <form action="{{ route('login') }}" method="POST" class="w-100 mt-4 pt-2">
                                     @csrf
