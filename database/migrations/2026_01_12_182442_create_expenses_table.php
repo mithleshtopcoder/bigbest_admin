@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('expense_number')->unique();
             $table->foreignId('store_id')->nullable()->constrained('stores')->onDelete('set null');
             $table->foreignId('category_id')->nullable()->constrained('options')->onDelete('set null'); // Expense Category from options

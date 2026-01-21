@@ -102,7 +102,7 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>RG Organic Mart</h1>
+            <h1>Big Best</h1>
             <p>Fresh Organic Products - Farm to Door</p>
         </div>
 
@@ -148,9 +148,9 @@
         </div>
 
         <div class="footer">
-            <p>Thank you for choosing RG Organic Mart!</p>
+            <p>Thank you for choosing Big Best!</p>
             <p>For any queries, please contact us at: info@rgorganicmart.com</p>
-            <p>&copy; {{ date('Y') }} RG Organic Mart. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Big Best. All rights reserved.</p>
         </div>
     </div>
 </body>

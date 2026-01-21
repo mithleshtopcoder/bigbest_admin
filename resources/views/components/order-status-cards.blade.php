@@ -9,8 +9,8 @@ $statusRoutes = [
 'cancelled' => 'cancelled',
 ];
 
+$statusescc = [['label' => 'New Order (POS)', 'count' => $newPosOrderCount ?? 0, 'icon' => 'bi bi-cart', 'status' => 'new-order-pos', 'color' => 'bg-warning text-white', 'db_status' => 'pending', 'route' => 'new-order.index', 'route_param' => 'pos'],];
 $statuses = [
-['label' => 'New Order (POS)', 'count' => $newPosOrderCount ?? 0, 'icon' => 'bi bi-cart', 'status' => 'new-order-pos', 'color' => 'bg-warning text-white', 'db_status' => 'pending', 'route' => 'new-order.index', 'route_param' => 'pos'],
 ['label' => 'New Order (Online)', 'count' => $newOrderCount ?? 0, 'icon' => 'bi bi-plus-circle', 'status' => 'new-order-online', 'color' => 'bg-primary text-white', 'db_status' => 'pending', 'route' => 'new-order.index', 'route_param' => 'online'],
 ['label' => 'Accepted Order', 'count' => $statusCounts['confirmed'] ?? 0, 'icon' => 'bi bi-check-circle', 'status' => 'accepted', 'color' => 'bg-info text-white', 'db_status' => 'confirmed'],
 ['label' => 'Preparing Order', 'count' => $statusCounts['processing'] ?? 0, 'icon' => 'bi bi-hourglass-split', 'status' => 'preparing', 'color' => 'bg-secondary text-white', 'db_status' => 'processing'],
@@ -81,15 +81,9 @@ $statuses = [
     }
 
     .dashboard-card.active .card {
-        border-color: #ffc107f5 !important;
-        border-width: 1px !important;
-        /* box-shadow: 4px 4px 12px #ffc107b0 !important; */
-        background-color: rgb(19 84 58);
-    }
-
-    .dashboard-card.active .card .active-color {
-
-        color: white !important;
+        border-color: #ff0707f5 !important;
+    border-width: 1px !important;
+    box-shadow: 4px 4px 12px #ff0707b0 !important;
     }
 
     .dashboard-card.active:hover {

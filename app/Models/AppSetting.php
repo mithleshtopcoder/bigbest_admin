@@ -90,7 +90,7 @@ public function getImageUrlAttribute()
         if (!$settings) {
             // Create default settings if none exist
             $settings = self::create([
-                'company_name' => 'R G Organic Mart',
+                'company_name' => 'Big Best',
                 'company_title' => 'Fresh Organic Products',
                 'currency' => 'INR',
                 'currency_symbol' => '₹',

@@ -162,7 +162,7 @@ class NotificationSeeder extends Seeder
                 [
                     'customer_id' => $customer->id,
                     'type' => 'system',
-                    'title' => 'Welcome to RG Organic Mart!',
+                    'title' => 'Welcome to Big Best!',
                     'message' => "Thank you for joining us! Get ₹100 welcome bonus in your wallet. Start shopping now!",
                     'data' => [
                         'welcome_bonus' => 100,

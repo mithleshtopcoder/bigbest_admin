@@ -23,6 +23,9 @@ class SuperAdminSeeder extends Seeder
             $user = User::create([
                 'name' => 'Super Admin',
                 'uuid' => '123456789',
+                'user_type' => 'admin',
+                'is_access' => 'admin',
+                'vendor_id' => 'VND-123456789',
                 'email' => $superAdminEmail,
                 'password' => Hash::make('superadmin@123'), // Default password - should be changed after first login
                 'email_verified_at' => now(),

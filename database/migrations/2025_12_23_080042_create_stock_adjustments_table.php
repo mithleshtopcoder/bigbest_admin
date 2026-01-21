@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_adjustments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('adjustment_number')->unique();
             $table->foreignId('store_id')->constrained('stores')->onDelete('restrict');
             $table->enum('type', ['addition', 'reduction', 'correction']); // addition = stock increase, reduction = stock decrease, correction = both

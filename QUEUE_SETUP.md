@@ -41,7 +41,7 @@ Create a supervisor configuration file at `/etc/supervisor/conf.d/laravel-worker
 ```ini
 [program:laravel-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /home/expensi.in/public_html/rg-organic-mart/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --queue=invoices,emails,default
+command=php /home/expensi.in/public_html/bigbest-admin/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --queue=invoices,emails,default
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -49,7 +49,7 @@ killasgroup=true
 user=expen5770
 numprocs=2
 redirect_stderr=true
-stdout_logfile=/home/expensi.in/public_html/rg-organic-mart/storage/logs/worker.log
+stdout_logfile=/home/expensi.in/public_html/bigbest-admin/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
@@ -73,7 +73,7 @@ After=network.target
 User=expen5770
 Group=expen5770
 Restart=always
-ExecStart=/usr/bin/php /home/expensi.in/public_html/rg-organic-mart/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --queue=invoices,emails,default
+ExecStart=/usr/bin/php /home/expensi.in/public_html/bigbest-admin/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --queue=invoices,emails,default
 
 [Install]
 WantedBy=multi-user.target

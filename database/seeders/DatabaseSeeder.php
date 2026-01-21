@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             StoreSeeder::class, // Must be before ProductSeeder
             DepartmentSeeder::class, // Must be before DesignationSeeder
             DesignationSeeder::class, // Requires departments
-            ProductSeeder::class, // Requires stores for stock creation
+            // ProductSeeder::class, // Requires stores for stock creation
             CouponSeeder::class, // Requires categories and brands
             OfferSeeder::class, // Requires categories, brands, and products
             ComboOfferSeeder::class, // Requires products and variants

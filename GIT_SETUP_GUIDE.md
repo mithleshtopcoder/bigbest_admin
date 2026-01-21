@@ -20,7 +20,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIABvpdufLRcskgARxxEy0Zlg6sa/g2yFLnmPhJh/QX5k
 ### Step 2: Add SSH Key to GitHub
 1. Go to GitHub → Settings → SSH and GPG keys
 2. Click "New SSH key"
-3. Title: `VPS Server - rg-organic-mart`
+3. Title: `VPS Server - bigbest-admin`
 4. Paste the public key above
 5. Click "Add SSH key"
 
@@ -34,14 +34,14 @@ The SSH key needs to be added to the **rstc-iffat** GitHub account (or the accou
 ### Step 1: Create GitHub Personal Access Token
 1. Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
 2. Click "Generate new token (classic)"
-3. Name: `VPS Server - rg-organic-mart`
+3. Name: `VPS Server - bigbest-admin`
 4. Select scopes: `repo` (full control of private repositories)
 5. Click "Generate token"
 6. **Copy the token immediately** (you won't see it again!)
 
 ### Step 2: Update Remote URL with Token
 ```bash
-cd /home/expensi.in/public_html/rg-organic-mart
+cd /home/expensi.in/public_html/bigbest-admin
 git remote set-url origin https://YOUR_TOKEN@github.com/rstc-iffat/real_gold_farming.git
 ```
 
@@ -77,7 +77,7 @@ EOF
 
 ### Step 3: Update Remote URL
 ```bash
-cd /home/expensi.in/public_html/rg-organic-mart
+cd /home/expensi.in/public_html/bigbest-admin
 git remote set-url origin git@github.com-rstc-iffat:rstc-iffat/real_gold_farming.git
 ```
 
@@ -93,7 +93,7 @@ Add this key to the **rstc-iffat** GitHub account.
 
 After setup, test with:
 ```bash
-cd /home/expensi.in/public_html/rg-organic-mart
+cd /home/expensi.in/public_html/bigbest-admin
 git fetch origin
 git pull origin rstc-iqarar
 ```

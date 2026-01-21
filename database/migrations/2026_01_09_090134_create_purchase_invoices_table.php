@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_invoices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('invoice_number')->unique();
             $table->foreignId('purchase_order_id')->nullable()->constrained('purchase_orders')->onDelete('set null');
             $table->foreignId('purchase_receipt_id')->nullable()->constrained('purchase_receipts')->onDelete('set null');

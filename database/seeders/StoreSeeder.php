@@ -18,6 +18,7 @@ class StoreSeeder extends Seeder
             [
                 'name' => 'Organic Fresh - Downtown Store',
                 'code' => 'STORE001',
+                'user_id' => 1,
                 'email' => 'downtown@organicfresh.com',
                 'phone' => '+91-9876543210',
                 'address' => '123 Main Street, Downtown',
@@ -41,6 +42,7 @@ class StoreSeeder extends Seeder
             [
                 'name' => 'Organic Fresh - Suburban Store',
                 'code' => 'STORE002',
+                'user_id' => 1,
                 'email' => 'suburban@organicfresh.com',
                 'phone' => '+91-9876543220',
                 'address' => '456 Park Avenue, Suburban',
@@ -64,6 +66,7 @@ class StoreSeeder extends Seeder
             [
                 'name' => 'Organic Fresh - North Store',
                 'code' => 'STORE003',
+                'user_id' => 1,
                 'email' => 'north@organicfresh.com',
                 'phone' => '+91-9876543230',
                 'address' => '789 North Street, North Mumbai',

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_adjustment_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('stock_adjustment_id')->constrained('stock_adjustments')->onDelete('cascade');
             $table->foreignId('product_variant_id')->constrained('product_variants')->onDelete('restrict');
             $table->integer('current_quantity'); // Quantity before adjustment

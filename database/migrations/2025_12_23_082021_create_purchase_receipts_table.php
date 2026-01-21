@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_receipts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('receipt_number')->unique();
             $table->foreignId('purchase_order_id')->constrained('purchase_orders')->onDelete('restrict');
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
