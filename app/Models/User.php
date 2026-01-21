@@ -112,7 +112,10 @@ class User extends Authenticatable
         
         return $query->exists();
     }
-
+public function vendorDocument()
+{
+    return $this->hasOne(VendorDocument::class, 'vendor_id', 'vendor_id');
+}
     /**
      * Check permission by slug (custom method - use hasPermissionTo() for Spatie's standard check)
      * This is kept for backward compatibility with AppServiceProvider
@@ -135,6 +138,29 @@ class User extends Authenticatable
             }
         })->exists();
     }
+// Orders relationship
+public function orders()
+{
+    return $this->hasMany(Order::class, 'vendor_id', 'vendor_id');
+}
+
+// Vendor payouts relationship
+public function payouts()
+{
+    return $this->hasMany(VendorPayout::class, 'vendor_id', 'vendor_id');
+}
+
+// Calculate payable amount
+public function payableAmount()
+{
+    $totalEarnings = $this->orders()
+                          ->where('status', 'delivered')
+                          ->sum('total_amount'); // replace with your column
+
+    $totalPaid = $this->payouts()->sum('amount');
+
+    return $totalEarnings - $totalPaid;
+}
 
     /**
      * Get all permissions through roles (using Spatie's method)

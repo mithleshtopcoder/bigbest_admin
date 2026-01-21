@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\InvoiceService;
+use App\Models\User;
 
 class Order extends Model
 {
@@ -135,6 +136,12 @@ class Order extends Model
     {
         return $this->belongsTo(Coupon::class);
     }
+
+    public function vendor()
+{
+    return $this->belongsTo(User::class, 'vendor_id', 'vendor_id'); 
+    
+}
 
     public function createdBy()
     {

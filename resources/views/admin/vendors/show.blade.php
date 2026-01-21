@@ -14,6 +14,10 @@
         <h5 class="mb-3">Basic Information</h5>
         <table class="table table-bordered">
             <tr>
+                <th>Company Name</th>
+                <td>{{ $vendor->vendorDocument->company_name ?? '-' }}</td>
+            </tr>
+            <tr>
                 <th>Name</th>
                 <td>{{ $vendor->name }}</td>
             </tr>
@@ -23,23 +27,23 @@
             </tr>
             <tr>
                 <th>Phone</th>
-                <td>{{ $vendor->phone ?? '-' }}</td>
-            </tr>
-            <tr>
-                <th>Store Name</th>
-                <td>{{ $vendor->store_name ?? '-' }}</td>
+                <td>{{ $vendor->mobile_number ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Address</th>
-                <td>{{ $vendor->address ?? '-' }}</td>
+                <td>{{ $vendor->vendorDocument->address ?? '-' }}</td>
             </tr>
             <tr>
                 <th>PAN Number</th>
-                <td>{{ $vendor->pan_number ?? '-' }}</td>
+                <td>{{ $vendor->vendorDocument->pan_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Aadhar Number</th>
+                <td>{{ $vendor->vendorDocument->aadhar_number ?? '-' }}</td>
             </tr>
             <tr>
                 <th>GST Number</th>
-                <td>{{ $vendor->gst_number ?? '-' }}</td>
+                <td>{{ $vendor->vendorDocument->gst_number ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Status</th>
@@ -53,14 +57,39 @@
             </tr>
         </table>
 
+        {{-- Bank Details --}}
+        <h5 class="mt-4 mb-3">Bank Details</h5>
+        <table class="table table-bordered">
+            <tr>
+                <th>Bank Name</th>
+                <td>{{ $vendor->vendorDocument->bank_name ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Account Number</th>
+                <td>{{ $vendor->vendorDocument->account_number ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Account Type</th>
+                <td>{{ $vendor->vendorDocument->account_type ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>IFSC Code</th>
+                <td>{{ $vendor->vendorDocument->ifsc_code ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Branch Name</th>
+                <td>{{ $vendor->vendorDocument->branch_name ?? '-' }}</td>
+            </tr>
+        </table>
+
         {{-- KYC Documents --}}
         <h5 class="mt-4 mb-3">KYC Documents</h5>
         <div class="row">
             @php
             $kycDocs = [
-            'PAN Card' => $vendor->pan_file,
-            'GST Certificate' => $vendor->gst_file,
-            'Address Proof' => $vendor->address_proof_file
+            'PAN Card' => $vendor->vendorDocument->pan_file ?? null,
+            'Aadhar Card' => $vendor->vendorDocument->aadhar_file ?? null,
+            'GST Certificate' => $vendor->vendorDocument->gst_certificate ?? null
             ];
             @endphp
 
@@ -71,16 +100,16 @@
                     <div class="card-body text-center">
                         @if($file)
                         @php
-                        $ext = pathinfo($file, PATHINFO_EXTENSION);
-                        $fileUrl = asset('documents/vendors/kyc/' . $file);
+                        $fileUrl = asset('documents/vendor-documents/' . urlencode($file));
+                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                         @endphp
 
-                        @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
+                        @if(in_array($ext, ['jpg','jpeg','png','gif']))
                         <img src="{{ $fileUrl }}" class="img-fluid mb-2" style="max-height:150px; cursor:pointer;" onclick="window.open('{{ $fileUrl }}', '_blank')">
-                        @elseif(strtolower($ext) === 'pdf')
-                        <i class="bi bi-file-earmark-pdf" style="font-size:48px;"></i>
-                        <div>
-                            <a href="{{ $fileUrl }}" target="_blank" class="btn btn-sm btn-primary mt-2">View PDF</a>
+                        @elseif($ext === 'pdf')
+                        <i class="bi bi-file-earmark-pdf" style="font-size:48px; cursor:pointer;" onclick="window.open('{{ $fileUrl }}', '_blank')"></i>
+                        <div class="mt-2">
+                            <a href="{{ $fileUrl }}" target="_blank" class="btn btn-sm btn-primary">View PDF</a>
                         </div>
                         @else
                         <span class="text-muted">File type not supported</span>

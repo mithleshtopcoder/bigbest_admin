@@ -31,6 +31,7 @@
                 <button class="btn btn-xs btn-success btn-card-fullscreen" data-bs-toggle="tooltip" title="Maximize"><i class="bi bi-arrows-fullscreen"></i></button>
             </div>
         </div>
+
         <div class="card-body">
             @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -43,7 +44,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Store Name</th>
+                        <th>Company Name</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -54,12 +55,11 @@
                         <td>{{ $loop->iteration + ($vendors->currentPage()-1) * $vendors->perPage() }}</td>
                         <td>{{ $vendor->name }}</td>
                         <td>{{ $vendor->email }}</td>
-                        <td>{{ $vendor->phone ?? '-' }}</td>
-                        <td>{{ $vendor->store_name ?? '-' }}</td>
+                        <td>{{ $vendor->mobile_number ?? '-' }}</td>
+                        <td>{{ $vendor->vendorDocument->company_name ?? '-' }}</td>
                         <td>
-                            <span class="badge 
-                                    {{ $vendor->status == 'pending' ? 'bg-warning' : ($vendor->status == 'approved' ? 'bg-success' : 'bg-danger') }}">
-                                {{ ucfirst($vendor->status) }}
+                            <span class="badge {{ $vendor->status == 1 ? 'bg-success' : 'bg-warning' }}">
+                                {{ $vendor->status == 1 ? 'Approved' : 'Pending' }}
                             </span>
                         </td>
                         <td>

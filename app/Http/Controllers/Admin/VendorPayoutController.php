@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vendor;
+use App\Models\User; // Users act as vendors
 use App\Models\VendorPayout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ class VendorPayoutController extends Controller
      */
     public function index()
     {
-        $payouts = VendorPayout::with('vendor')
+        $payouts = VendorPayout::with('vendor') // vendor is a relation to User model
             ->latest()
             ->paginate(20);
 
@@ -27,7 +27,10 @@ class VendorPayoutController extends Controller
      */
     public function create()
     {
-        $vendors = Vendor::where('status', 'approved')->get();
+        // Get all approved vendors from users table
+        $vendors = User::where('user_type', 'vendor')
+            ->where('status', 1) // approved
+            ->get();
 
         return view('admin.vendor_payouts.create', compact('vendors'));
     }
@@ -38,25 +41,23 @@ class VendorPayoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'vendor_id' => 'required|exists:vendors,id',
+            'vendor_id' => 'required|exists:users,id', // vendor_id references users table
             'amount'    => 'required|numeric|min:1',
             'note'      => 'nullable|string|max:500',
         ]);
 
-        $vendor = Vendor::findOrFail($request->vendor_id);
+        $vendor = User::findOrFail($request->vendor_id);
 
-        $payable = $vendor->payableAmount();
+        // Example: If you want to check payable amount, you can add a method in User model
+        if (method_exists($vendor, 'payableAmount')) {
+            $payable = $vendor->payableAmount();
+            if ($payable <= 0) {
+                return back()->withErrors(['amount' => 'Vendor has no payable balance']);
+            }
 
-        if ($payable <= 0) {
-            return back()->withErrors([
-                'amount' => 'Vendor has no payable balance'
-            ]);
-        }
-
-        if ($request->amount > $payable) {
-            return back()->withErrors([
-                'amount' => 'Amount exceeds vendor payable balance'
-            ]);
+            if ($request->amount > $payable) {
+                return back()->withErrors(['amount' => 'Amount exceeds vendor payable balance']);
+            }
         }
 
         VendorPayout::create([

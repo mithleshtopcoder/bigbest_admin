@@ -34,15 +34,15 @@
                         <div class="form-group row">
                             <label class="form-label col-md-2">Company Name <span class="text-danger">*</span></label>
                             <div class="col-md-4 ps-1">
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
-                                @error('name')
+                                <input type="text" name="company_name" class="form-control @error('company_name') is-invalid @enderror" value="{{ old('company_name') }}" required>
+                                @error('company_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <label class="form-label col-md-2">Name <span class="text-danger">*</span></label>
                             <div class="col-md-4 ps-1">
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
-                                @error('email')
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                                @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -89,7 +89,7 @@
                             <label class="form-label col-md-2">PAN Card <span class="text-danger">*</span></label>
                             <div class="col-md-4 ps-1">
                                 <input type="file" name="pan_file" class="form-control @error('pan_file') is-invalid @enderror" value="{{ old('pan_file') }}" required>
-                                @error('aadhar_number')
+                                @error('pan_file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -97,15 +97,15 @@
                         <div class="form-group row">
                             <label class="form-label col-md-2">Aadhar Number</label>
                             <div class="col-md-4 ps-1">
-                                <input type="text" name="pan_number" class="form-control @error('pan_number') is-invalid @enderror" value="{{ old('pan_number') }}">
-                                @error('pan_number')
+                                <input type="text" name="aadhar_number" class="form-control @error('aadhar_number') is-invalid @enderror" value="{{ old('aadhar_number') }}">
+                                @error('aadhar_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <label class="form-label col-md-2">Aadhar Card  <span class="text-danger">*</span></label>
+                            <label class="form-label col-md-2">Aadhar Card <span class="text-danger">*</span></label>
                             <div class="col-md-4 ps-1">
-                                <input type="file" name="aadhar_number" class="form-control @error('aadhar_number') is-invalid @enderror" value="{{ old('aadhar_number') }}" required>
-                                @error('aadhar_number')
+                                <input type="file" name="aadhar_file" class="form-control @error('aadhar_file') is-invalid @enderror" value="{{ old('aadhar_file') }}" required>
+                                @error('aadhar_file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -114,8 +114,8 @@
                         <div class="form-group row">
                             <label class="form-label col-md-2">GST Number</label>
                             <div class="col-md-4 ps-1">
-                                <input type="text" name="pan_number" class="form-control @error('pan_number') is-invalid @enderror" value="{{ old('pan_number') }}">
-                                @error('pan_number')
+                                <input type="text" name="gst_number" class="form-control @error('gst_number') is-invalid @enderror" value="{{ old('gst_number') }}">
+                                @error('gst_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -132,15 +132,15 @@
                         <div class="form-group row">
                             <label class="form-label col-md-2">Password</label>
                             <div class="col-md-4 ps-1">
-                                <input type="text" name="address_proof_file" class="form-control @error('address_proof_file') is-invalid @enderror" value="{{ old('address_proof_file') }}">
-                                @error('address_proof_file')
+                                <input type="text" name="password" class="form-control @error('password') is-invalid @enderror" value="{{ old('password') }}">
+                                @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <label class="form-label col-md-2">Confirm Password <span class="text-danger">*</span></label>
                             <div class="col-md-4 ps-1">
-                                <input type="text" name="gst_certificate" class="form-control @error('gst_certificate') is-invalid @enderror" value="{{ old('gst_certificate') }}" required>
-                                @error('gst_certificate')
+                                <input type="text" name="confirmpassword" class="form-control @error('confirmpassword') is-invalid @enderror" value="{{ old('confirmpassword') }}" required>
+                                @error('confirmpassword')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -206,7 +206,9 @@
         </div>
     </div>
 </div>
-
+@endsection
+@section('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
 <!-- Scripts -->
 <script>
     // Toggle password visibility

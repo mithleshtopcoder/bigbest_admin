@@ -29,14 +29,14 @@
                 @forelse($payouts as $payout)
                 <tr>
                     <td>
-                        <strong>{{ $payout->vendor->name }}</strong><br>
+                        <strong>{{ $payout->vendor->name ?? '-' }}</strong><br>
                         <small class="text-muted">
-                            {{ $payout->vendor->vendor_uid }}
+                            {{ $payout->vendor->vendor_id ?? '-' }}
                         </small>
                     </td>
 
                     <td>
-                        ₹ {{ number_format($payout->vendor->payableAmount(), 2) }}
+                        ₹ {{ $payout->vendor && method_exists($payout->vendor, 'payableAmount') ? number_format($payout->vendor->payableAmount(), 2) : '0.00' }}
                     </td>
 
                     <td>
@@ -97,7 +97,7 @@
                 <div class="modal-body">
                     <p>
                         Pay <strong>₹ {{ number_format($payout->amount, 2) }}</strong>
-                        to <strong>{{ $payout->vendor->name }}</strong>
+                        to <strong>{{ $payout->vendor->name ?? '-' }}</strong>
                     </p>
 
                     <div class="mb-2">

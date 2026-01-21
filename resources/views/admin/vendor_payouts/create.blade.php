@@ -18,8 +18,11 @@
                 <select name="vendor_id" id="vendor_id" class="form-control" required>
                     <option value="">Select Vendor</option>
                     @foreach($vendors as $vendor)
-                    <option value="{{ $vendor->id }}" data-payable="{{ $vendor->payableAmount() }}">
-                        {{ $vendor->name }} ({{ $vendor->vendor_uid }})
+                    <option value="{{ $vendor->id }}" data-payable="{{ method_exists($vendor, 'payableAmount') ? $vendor->payableAmount() : 0 }}">
+                        {{ $vendor->name }}
+                        @if($vendor->vendorDocument && $vendor->vendorDocument->company_name)
+                        ({{ $vendor->vendorDocument->company_name }})
+                        @endif
                     </option>
                     @endforeach
                 </select>
@@ -35,9 +38,7 @@
             <div class="mb-3">
                 <label class="form-label">Payout Amount</label>
                 <input type="number" name="amount" id="amount" class="form-control" min="1" step="0.01" required>
-                <small class="text-muted">
-                    Cannot exceed payable amount
-                </small>
+                <small class="text-muted">Cannot exceed payable amount</small>
             </div>
 
             {{-- Note --}}
@@ -46,19 +47,17 @@
                 <textarea name="note" class="form-control"></textarea>
             </div>
 
-            <button class="btn btn-primary">
-                Create Payout
-            </button>
+            <button class="btn btn-primary">Create Payout</button>
         </form>
     </div>
 </div>
 
 <script>
     document.getElementById('vendor_id').addEventListener('change', function() {
-        const payable = this.options[this.selectedIndex].dataset.payable || 0;
+        const selectedOption = this.options[this.selectedIndex];
+        const payable = selectedOption.dataset.payable || 0;
 
-        document.getElementById('payable_amount').value =
-            '₹ ' + parseFloat(payable).toFixed(2);
+        document.getElementById('payable_amount').value = '₹ ' + parseFloat(payable).toFixed(2);
 
         const amountInput = document.getElementById('amount');
         amountInput.max = payable;
