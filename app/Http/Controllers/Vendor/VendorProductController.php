@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Vendor;
-
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\OptionMaster;
@@ -98,70 +98,9 @@ class VendorProductController extends Controller
 
 public function store(Request $request)
 {
-    dd(auth()->user());
-    DB::beginTransaction();
-
-    try {
-        $user = auth()->user(); // logged-in vendor
-        $vendorId = $user->vendor_id; // ✅ vendor_id is already in user table
-
-        // ================= VALIDATION =================
-        $validated = $request->validate([
-            'name'             => 'required|string|max:255',
-            'category_id'      => 'required|exists:categories,id',
-            'sub_category_id'  => 'nullable|exists:sub_categories,id',
-            'brand_id'         => 'nullable|exists:brands,id',
-            'sku'              => 'nullable|string|max:100|unique:products,sku',
-            'barcode'          => 'nullable|string|max:100|unique:products,barcode',
-            'item_code'        => 'nullable|string|max:100|unique:products,item_code',
-            'item_type'        => 'nullable|integer',
-            'description'      => 'nullable|string',
-            'thumbnail_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'collection'       => 'nullable|integer',
-            'season'           => 'nullable|integer',
-        ]);
-
-        // ================= IMAGE UPLOAD =================
-        $thumbnailName = null;
-        if ($request->hasFile('thumbnail_image')) {
-            $image_name = 'thumbnail_image-' . date('YmdHis') . uniqid();
-            $thumbnailName = MyHelper::uploadImage($request->file('thumbnail_image'), $this->folder, $image_name);
-        }
-
-        // ================= CREATE PRODUCT =================
-       $product = Product::create([
-    'name'            => $request->name,
-    'slug'            => Str::slug($request->name),
-    'sku'             => $request->sku,
-    'description'     => $request->description,
-    'category_id'     => $request->category_id,
-    'sub_category_id' => $request->sub_category_id,
-    'brand_id'        => $request->brand_id,
-    'barcode'         => $request->barcode,
-    'item_type'       => $request->item_type,
-    'item_code'       => $request->item_code,
-    'collection'      => $request->collection,
-    'season'          => $request->season,
-    'thumbnail_image' => $thumbnailName,
-    'status'          => 0, // pending by default
-    'approval_status' => 'pending',
-    'vendor_id'       => auth()->user()->vendor_id, // ✅ vendor table ID
-]);
-
-
-        DB::commit();
-
-        return redirect()
-            ->route('vendor.products.index')
-            ->with('success', 'Product submitted successfully and is pending admin approval.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()
-            ->withInput()
-            ->with('error', $e->getMessage());
-    }
+    dd(auth()->check(), auth()->user());
 }
+
 
     public function edit(Product $product)
     {

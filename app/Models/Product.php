@@ -158,10 +158,9 @@ class Product extends Model
         return $this->hasMany(ProductReview::class)->where('status', 'approved');
     }
 
-    public function vendor()
+ public function vendor()
 {
-    return $this->belongsTo(Vendor::class, 'vendor_id', 'id'); 
-    // 'vendor_id' = foreign key in products table
-    // 'id'        = primary key in vendors table
+    return $this->belongsTo(User::class, 'vendor_id', 'id')
+                ->where('user_type', 'vendor'); // ensures only vendor users
 }
 }

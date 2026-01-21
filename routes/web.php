@@ -714,19 +714,8 @@ Route::middleware(['auth', 'vendor'])
     ->name('vendor.')
     ->group(function () {
 
-    Route::get('/dashboard', [VendorDashboardController::class, 'index'])
-        ->name('dashboard');
-
     Route::resource('products', VendorProductController::class);
 
-    Route::get('/orders', [VendorOrderController::class, 'index'])
-        ->name('orders.index');
-
-    Route::get('/payouts', [VendorPayoutController::class, 'index'])
-        ->name('payouts.index');
-
-    Route::get('/profile', [VendorProfileController::class, 'index'])
-        ->name('profile');
 });
 
 
