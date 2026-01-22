@@ -257,405 +257,408 @@
                                         @method('PUT')
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <div class="form-group row">
+                                                {{-- <div class="form-group row">
                                                     <label class="form-label col-md-5">Unit</label>
                                                     <div class="col-md-7 ps-1">
                                                         <select name="unit" class="form-control" required>
                                                             <option value="">Select Unit</option>
                                                             @foreach(['pcs','pack','box','bottle','bag','dozen'] as $unit)
                                                             <option value="{{ $unit }}" {{ old('unit', $product->unit ?? '') == $unit ? 'selected' : '' }}>
-                                                                {{ ucfirst($unit) }}
-                                                            </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                                {{ ucfirst($unit) }}
+                                                </option>
+                                                @endforeach
+                                                </select>
+                                            </div>
+                                        </div> --}}
 
-                                                <div class="form-group row">
+                                        {{-- <div class="form-group row">
                                                     <label class="form-label col-md-5">Weight Unit</label>
                                                     <div class="col-md-7 ps-1">
                                                         <select name="weight_unit" class="form-control" required>
                                                             <option value="">Select Weight Unit</option>
                                                             @foreach(['g','kg','ml','l'] as $w)
                                                             <option value="{{ $w }}" {{ old('weight_unit', $product->weight_unit ?? '') == $w ? 'selected' : '' }}>
-                                                                {{ strtoupper($w) }}
-                                                            </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="form-label col-md-5">Status</label>
-                                                    <div class="col-md-7 ps-1">
-                                                        <select name="status" class="form-control">
-                                                            <option value="active" {{ old('status', $product->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                                Active
-                                                            </option>
-                                                            <option value="inactive" {{ old('status', $product->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                                Inactive
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-group row">
-                                                    <label class="form-label col-md-5">Min Order Qty</label>
-                                                    <div class="col-md-7 ps-1">
-                                                        <input type="number" name="min_order_quantity" class="form-control" value="{{ old('min_order_quantity', $product->min_order_quantity ?? 1) }}">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="form-label col-md-5">Max Order Qty</label>
-                                                    <div class="col-md-7 ps-1">
-                                                        <input type="number" name="max_order_quantity" class="form-control" value="{{ old('max_order_quantity', $product->max_order_quantity ?? 1) }}">
-                                                    </div>
-                                                </div>
-                                                {{-- <div class="form-group row">
+                                        {{ strtoupper($w) }}
+                                        </option>
+                                        @endforeach
+                                        </select>
+                                </div>
+                            </div> --}}
+
+                            <div class="form-group row">
+                                <label class="form-label col-md-5">Min Order Qty</label>
+                                <div class="col-md-7 ps-1">
+                                    <input type="number" name="min_order_quantity" class="form-control" value="{{ old('min_order_quantity', $product->min_order_quantity ?? 1) }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="form-label col-md-5">Status</label>
+                                <div class="col-md-7 ps-1">
+                                    <select name="status" class="form-control">
+                                        <option value="active" {{ old('status', $product->status ?? '') == 'active' ? 'selected' : '' }}>
+                                            Active
+                                        </option>
+                                        <option value="inactive" {{ old('status', $product->status ?? '') == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+
+                            <div class="form-group row">
+                                <label class="form-label col-md-5">Max Order Qty</label>
+                                <div class="col-md-7 ps-1">
+                                    <input type="number" name="max_order_quantity" class="form-control" value="{{ old('max_order_quantity', $product->max_order_quantity ?? 1) }}">
+                                </div>
+                            </div>
+                            {{-- <div class="form-group row">
                                                     <label class="form-label col-md-5">Track Inventory</label>
                                                     <div class="col-md-7 ps-1">
                                                         <div class="form-check form-switch">
                                                             <input class="form-check-input" type="checkbox" name="track_inventory" value="1" {{ old('track_inventory', $product->track_inventory ?? 1) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="trackInventory">Enable inventory tracking</label>
-                                            </div>
-                                        </div>
-                                </div> --}}
-                                {{-- <div class="form-group row">
+                            <label class="form-check-label" for="trackInventory">Enable inventory tracking</label>
+                        </div>
+                    </div>
+                </div> --}}
+                {{-- <div class="form-group row">
                                                     <label class="form-label col-md-5">Allow Backorder</label>
                                                     <div class="col-md-7 ps-1">
                                                         <div class="form-check form-switch">
                                                             <input class="form-check-input" type="checkbox" name="allow_backorder" value="1" {{ old('allow_backorder', $product->allow_backorder ?? 0) ? 'checked' : '' }}> <label class="form-check-label" for="allowBackorder">Allow backorder when out of stock</label>
-                            </div>
-                        </div>
-                    </div> --}}
-                    <div class="form-group row">
+            </div>
+        </div>
+    </div> --}}
+    {{-- <div class="form-group row">
                         <label class="form-label col-md-5">Weight (grams)</label>
                         <div class="col-md-7 ps-1">
                             <input type="number" name="weight" class="form-control" step="0.01" value="{{ old('weight', $product->weight ?? '') }}">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="form-label col-md-5">Dimensions (L x W x H)</label>
-                        <div class="col-md-7 ps-1">
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="number" name="length" class="form-control" placeholder="Length" step="0.01">
-                                </div>
-                                <div class="col-4">
-                                    <input type="number" name="width" class="form-control" placeholder="Width" step="0.01">
-                                </div>
-                                <div class="col-4">
-                                    <input type="number" name="height" class="form-control" placeholder="Height" step="0.01">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 mt-2">
-                    <div class="d-flex gap-2 justify-content-center">
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="feather-save"></i>Save Product
-                        </button>
-                        <a href="{{ route('manage-product.product-master.index') }}" class="btn btn-light btn-sm">
-                            <i class="feather-x"></i> Cancel
-                        </a>
-                    </div>
-                </div>
-            </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Configuration Tab -->
-    <div class="tab-pane fade" id="configuration" role="tabpanel" aria-labelledby="configuration-tab">
+</div>
+</div> --}}
+<div class="form-group row">
+    <label class="form-label col-md-5">Dimensions (L x W x H)</label>
+    <div class="col-md-7 ps-1">
         <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm" id="variantTable">
-                        <!-- ================= HEADER ================= -->
-                        <thead class="table-light">
-                            <tr>
-                                <th width="30">No.</th>
-                                <th>Variant Name</th>
-                                <th>Code</th>
-                                <th>SKU</th>
-                                <th>Unit</th>
-                                <th>Unit Value</th>
-                                <th>Barcode</th>
-                                <th>Image</th>
-                                <th>Default</th>
-                                <th>Status</th>
-                                <th class="text-end d-flex gap-2">Action</th>
-                            </tr>
-                            <tr id="variantInputRow">
-                                <th><input type="text" class="form-control" style="width: 20px;" disabled></th>
-                                <th><input type="text" class="form-control" name="variant_name" placeholder="Variant Name"></th>
-                                <th><input type="text" class="form-control" name="variant_code" placeholder="Code"></th>
-                                <th><input type="text" class="form-control" name="variant_sku" placeholder="SKU (auto-generated)" title="SKU will be auto-generated from product SKU, variant name, and code. You can edit it manually."></th>
-                                <th>
-                                    <select class="form-control" name="variant_unit">
-                                        <option value="piece">Piece</option>
-                                        <option value="kg">Kg</option>
-                                        <option value="gram">Gram</option>
-                                        <option value="liter">Liter</option>
-                                        <option value="ml">ML</option>
-                                        <option value="bundle">Bundle</option>
-                                        <option value="bunch">Bunch</option>
-                                        <option value="packet">Packet</option>
-                                        <option value="box">Box</option>
-                                        <option value="bottle">Bottle</option>
-                                        <option value="can">Can</option>
-                                        <option value="dozen">Dozen</option>
-                                        <option value="pack">Pack</option>
-                                        <option value="loose">Loose</option>
-                                    </select>
-                                </th>
-                                <th><input type="text" class="form-control" name="variant_unit_value" placeholder="Unit Value"></th>
-                                <th><input type="text" class="form-control" name="variant_barcode" placeholder="Barcode (auto-generated)" title="Barcode will be auto-generated from SKU. You can edit it manually."></th>
-                                <th><input type="text" class="form-control" style="width: 20px;" disabled></th>
-                                <th>
-                                    <select class="form-control" name="variant_is_default">
-                                        <option value="0">No</option>
-                                        <option value="1">Yes</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <select class="form-control" name="variant_is_active">
-                                        <option value="1">Active</option>
-                                        <option value="0">Inactive</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <button type="button" id="variantSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addVariant()"><i class="bi bi-plus-circle"></i> Add</button>
-                                    <button type="button" id="variantCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <!-- ================= BODY ================= -->
-                        <tbody id="variantTableBody">
-
-                        </tbody>
-                    </table>
-                </div>
+            <div class="col-4">
+                <input type="number" name="length" class="form-control" placeholder="Length" step="0.01" value="{{ old('length', $product->length ?? '') }}">
+            </div>
+            <div class="col-4">
+                <input type="number" name="width" class="form-control" placeholder="Width" step="0.01" value="{{ old('width', $product->width ?? '') }}">
+            </div>
+            <div class="col-4">
+                <input type="number" name="height" class="form-control" placeholder="Height" step="0.01" value="{{ old('height', $product->height ?? '') }}">
             </div>
         </div>
     </div>
+</div>
+</div>
+<div class="col-12 mt-2">
+    <div class="d-flex gap-2 justify-content-center">
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="feather-save"></i>Save Product
+        </button>
+        <a href="{{ route('manage-product.product-master.index') }}" class="btn btn-light btn-sm">
+            <i class="feather-x"></i> Cancel
+        </a>
+    </div>
+</div>
+</div>
+</form>
+</div>
+</div>
 
-    <!-- Stock Master Tab -->
-    <div class="tab-pane fade" id="stockMaster" role="tabpanel" aria-labelledby="stockMaster-tab">
-        <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm" id="manageStockTable">
-                        <thead>
-                            <tr>
-                                <th>Variant Name</th>
-                                <th>Item No.</th>
-                                <th>In Stock</th>
-                                <th>Available</th>
-                                <th>In Transit</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockTableBody">
-                            @foreach($product->variants as $variant)
-                            <tr>
-                                <td>{{ $variant->name }}</td>
-                                <td>{{ $variant->sku }}</td>
-                                @php
-                                $inStockQty = $variant->stocks->sum('quantity');
-                                $availableQty = $variant->stocks->sum(function ($stock) {
-                                return max(($stock->quantity ?? 0) - ($stock->reserved_quantity ?? 0), 0);
-                                });
-                                $inTransitQty = $variant->stocks->sum('in_transit_quantity');
-                                @endphp
-                                <td><span style="cursor: pointer; color: #0d6efd;" onclick="showInStockModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $inStockQty }}</span></td>
-                                <td><span style="cursor: pointer; color: #0d6efd;" onclick="showAvailableModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $availableQty }}</span></td>
-                                <td><span style="cursor: pointer; color: #0d6efd;" onclick="showInTransitModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $inTransitQty }}</span></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+<!-- Configuration Tab -->
+<div class="tab-pane fade" id="configuration" role="tabpanel" aria-labelledby="configuration-tab">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle table-sm" id="variantTable">
+                    <!-- ================= HEADER ================= -->
+                    <thead class="table-light">
+                        <tr>
+                            <th width="30">No.</th>
+                            <th>Variant Name</th>
+                            <th>Code</th>
+                            <th>SKU</th>
+                            <th>Unit</th>
+                            <th>Unit Value</th>
+                            <th>Barcode</th>
+                            <th>Image</th>
+                            <th>Default</th>
+                            <th>Status</th>
+                            <th class="text-end d-flex gap-2">Action</th>
+                        </tr>
+                        <tr id="variantInputRow">
+                            <th><input type="text" class="form-control" style="width: 20px;" disabled></th>
+                            <th><input type="text" class="form-control" name="variant_name" placeholder="Variant Name"></th>
+                            <th><input type="text" class="form-control" name="variant_code" placeholder="Code"></th>
+                            <th><input type="text" class="form-control" name="variant_sku" placeholder="SKU (auto-generated)" title="SKU will be auto-generated from product SKU, variant name, and code. You can edit it manually."></th>
+                            <th>
+                                <select class="form-control" name="variant_unit">
+                                    <option value="piece">Piece</option>
+                                    <option value="kg">Kg</option>
+                                    <option value="gram">Gram</option>
+                                    <option value="liter">Liter</option>
+                                    <option value="ml">ML</option>
+                                    <option value="bundle">Bundle</option>
+                                    <option value="bunch">Bunch</option>
+                                    <option value="packet">Packet</option>
+                                    <option value="box">Box</option>
+                                    <option value="bottle">Bottle</option>
+                                    <option value="can">Can</option>
+                                    <option value="dozen">Dozen</option>
+                                    <option value="pack">Pack</option>
+                                    <option value="loose">Loose</option>
+                                </select>
+                            </th>
+                            <th><input type="text" class="form-control" name="variant_unit_value" placeholder="Unit Value"></th>
+                            <th><input type="text" class="form-control" name="variant_barcode" placeholder="Barcode (auto-generated)" title="Barcode will be auto-generated from SKU. You can edit it manually."></th>
+                            <th><input type="text" class="form-control" style="width: 20px;" disabled></th>
+                            <th>
+                                <select class="form-control" name="variant_is_default">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </th>
+                            <th>
+                                <select class="form-control" name="variant_is_active">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </th>
+                            <th>
+                                <button type="button" id="variantSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addVariant()"><i class="bi bi-plus-circle"></i> Add</button>
+                                <button type="button" id="variantCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
+                            </th>
+                        </tr>
+                    </thead>
 
-                    </table>
-                </div>
-                <div class="d-flex justify-content-end gap-2 mt-3"></div>
+                    <!-- ================= BODY ================= -->
+                    <tbody id="variantTableBody">
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Manage Stock Tab -->
-    <div class="tab-pane fade" id="manageStock" role="tabpanel" aria-labelledby="managestock-tab">
-        <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm" id="stockTable">
-                        <thead>
-                            <tr>
-                                <th>Warehouse/Location</th>
-                                <th>Product Variant</th>
-                                <th>Item No. (SKU)</th>
-                                <th>Quantity</th>
-                                <th>Min Stock</th>
-                                <th>Max Stock</th>
-                                <th>Status</th>
-                                <th>Created By</th>
-                                <th>Created At</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                            <tr id="stockInputRow">
-                                <th>
-                                    <select name="stock_store_id" id="stock_store_id" class="form-control" required>
-                                        <option value="">Select Store</option>
-                                        @foreach($stores as $store)
-                                        <option value="{{ $store->id }}">{{ $store->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </th>
-                                <th>
-                                    <select name="stock_variant_id" id="stock_variant_id" class="form-control" required>
-                                        <option value="">Select Variant</option>
-                                        @foreach($product->variants as $v)
-                                        <option value="{{ $v->id }}" data-sku="{{ $v->sku }}">{{ $v->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </th>
-                                <th>
-                                    <input type="text" name="stock_item_no" id="stock_item_no" class="form-control" readonly>
-                                </th>
-                                <th>
-                                    <input type="number" name="stock_quantity" id="stock_quantity" class="form-control" step="1" min="0" required>
-                                </th>
-                                <th>
-                                    <input type="number" name="stock_min" id="stock_min" class="form-control" step="1" min="0">
-                                </th>
-                                <th>
-                                    <input type="number" name="stock_max" id="stock_max" class="form-control" step="1" min="0">
-                                </th>
-                                <th>
-                                    <select name="stock_status" id="stock_status" class="form-control">
-                                        <option value="in_stock">In Stock</option>
-                                        <option value="low_stock">Low Stock</option>
-                                        <option value="out_of_stock">Out of Stock</option>
-                                        <option value="backorder">Backorder</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                                <th></th>
-                                <th class="text-end">
-                                    <button type="button" id="stockSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addStock()"><i class="bi bi-plus-circle"></i> Add</button>
-                                    <button type="button" id="stockCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelStockEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="manageStockTableBody">
-                            <tr>
-                                <td colspan="10" class="text-center text-muted">No stock records found. Add stock to get started.</td>
-                            </tr>
-                        </tbody>
+<!-- Stock Master Tab -->
+<div class="tab-pane fade" id="stockMaster" role="tabpanel" aria-labelledby="stockMaster-tab">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="manageStockTable">
+                    <thead>
+                        <tr>
+                            <th>Variant Name</th>
+                            <th>Item No.</th>
+                            <th>In Stock</th>
+                            <th>Available</th>
+                            <th>In Transit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        @foreach($product->variants as $variant)
+                        <tr>
+                            <td>{{ $variant->name }}</td>
+                            <td>{{ $variant->sku }}</td>
+                            @php
+                            $inStockQty = $variant->stocks->sum('quantity');
+                            $availableQty = $variant->stocks->sum(function ($stock) {
+                            return max(($stock->quantity ?? 0) - ($stock->reserved_quantity ?? 0), 0);
+                            });
+                            $inTransitQty = $variant->stocks->sum('in_transit_quantity');
+                            @endphp
+                            <td><span style="cursor: pointer; color: #0d6efd;" onclick="showInStockModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $inStockQty }}</span></td>
+                            <td><span style="cursor: pointer; color: #0d6efd;" onclick="showAvailableModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $availableQty }}</span></td>
+                            <td><span style="cursor: pointer; color: #0d6efd;" onclick="showInTransitModal({{ $variant->id }}, '{{ $variant->name }}')">{{ $inTransitQty }}</span></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
 
-                    </table>
-                </div>
-                <div class="d-flex justify-content-end gap-2 mt-3"></div>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Stock Tab -->
+<div class="tab-pane fade" id="manageStock" role="tabpanel" aria-labelledby="managestock-tab">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Warehouse/Location</th>
+                            <th>Product Variant</th>
+                            <th>Item No. (SKU)</th>
+                            <th>Quantity</th>
+                            <th>Min Stock</th>
+                            <th>Max Stock</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                        <tr id="stockInputRow">
+                            <th>
+                                <select name="stock_store_id" id="stock_store_id" class="form-control" required>
+                                    <option value="">Select Store</option>
+                                    @foreach($stores as $store)
+                                    <option value="{{ $store->id }}">{{ $store->name }}</option>
+                                    @endforeach
+                                </select>
+                            </th>
+                            <th>
+                                <select name="stock_variant_id" id="stock_variant_id" class="form-control" required>
+                                    <option value="">Select Variant</option>
+                                    @foreach($product->variants as $v)
+                                    <option value="{{ $v->id }}" data-sku="{{ $v->sku }}">{{ $v->name }}</option>
+                                    @endforeach
+                                </select>
+                            </th>
+                            <th>
+                                <input type="text" name="stock_item_no" id="stock_item_no" class="form-control" readonly>
+                            </th>
+                            <th>
+                                <input type="number" name="stock_quantity" id="stock_quantity" class="form-control" step="1" min="0" required>
+                            </th>
+                            <th>
+                                <input type="number" name="stock_min" id="stock_min" class="form-control" step="1" min="0">
+                            </th>
+                            <th>
+                                <input type="number" name="stock_max" id="stock_max" class="form-control" step="1" min="0">
+                            </th>
+                            <th>
+                                <select name="stock_status" id="stock_status" class="form-control">
+                                    <option value="in_stock">In Stock</option>
+                                    <option value="low_stock">Low Stock</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                    <option value="backorder">Backorder</option>
+                                </select>
+                            </th>
+                            <th></th>
+                            <th></th>
+                            <th class="text-end">
+                                <button type="button" id="stockSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addStock()"><i class="bi bi-plus-circle"></i> Add</button>
+                                <button type="button" id="stockCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelStockEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="manageStockTableBody">
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">No stock records found. Add stock to get started.</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Price Tab -->
+<div class="tab-pane fade" id="managePrice" role="tabpanel" aria-labelledby="manageprice-tab">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle table-sm" id="priceTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Variant Name</th>
+                            <th>Item No. (SKU)</th>
+                            <th>Cost Price</th>
+                            <th>MRP (Compare At Price)</th>
+                            <th>Selling Price <span class="text-danger">*</span></th>
+                            <th>Effective From</th>
+                            <th>Effective To</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                        <tr id="priceInputRow">
+                            <th>
+                                <select name="price_variant_id" id="price_variant_id" class="form-control" required>
+                                    <option value="">Select Variant</option>
+                                    @foreach($product->variants as $v)
+                                    <option value="{{ $v->id }}" data-sku="{{ $v->sku }}">{{ $v->name }}</option>
+                                    @endforeach
+                                </select>
+                            </th>
+                            <th>
+                                <input type="text" name="price_item_no" id="price_item_no" class="form-control" readonly>
+                            </th>
+                            <th>
+                                <input type="number" name="price_cost_price" id="price_cost_price" class="form-control" step="0.01" min="0">
+                            </th>
+                            <th>
+                                <input type="number" name="price_compare_at_price" id="price_compare_at_price" class="form-control" step="0.01" min="0">
+                            </th>
+                            <th>
+                                <input type="number" name="price_selling_price" id="price_selling_price" class="form-control" step="0.01" min="0" required>
+                            </th>
+                            <th>
+                                <input type="date" name="price_effective_from" id="price_effective_from" class="form-control">
+                            </th>
+                            <th>
+                                <input type="date" name="price_effective_to" id="price_effective_to" class="form-control">
+                            </th>
+                            <th>
+                                <select name="price_is_active" id="price_is_active" class="form-control">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </th>
+                            <th class="text-end">
+                                <button type="button" id="priceSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addPrice()"><i class="bi bi-plus-circle"></i> Add</button>
+                                <button type="button" id="priceCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelPriceEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="priceTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">No prices found. Add a price to get started.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Manage Price Tab -->
-    <div class="tab-pane fade" id="managePrice" role="tabpanel" aria-labelledby="manageprice-tab">
-        <div class="row">
-            <div class="col-12">
-
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle table-sm" id="priceTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Variant Name</th>
-                                <th>Item No. (SKU)</th>
-                                <th>Cost Price</th>
-                                <th>MRP (Compare At Price)</th>
-                                <th>Selling Price <span class="text-danger">*</span></th>
-                                <th>Effective From</th>
-                                <th>Effective To</th>
-                                <th>Status</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                            <tr id="priceInputRow">
-                                <th>
-                                    <select name="price_variant_id" id="price_variant_id" class="form-control" required>
-                                        <option value="">Select Variant</option>
-                                        @foreach($product->variants as $v)
-                                        <option value="{{ $v->id }}" data-sku="{{ $v->sku }}">{{ $v->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </th>
-                                <th>
-                                    <input type="text" name="price_item_no" id="price_item_no" class="form-control" readonly>
-                                </th>
-                                <th>
-                                    <input type="number" name="price_cost_price" id="price_cost_price" class="form-control" step="0.01" min="0">
-                                </th>
-                                <th>
-                                    <input type="number" name="price_compare_at_price" id="price_compare_at_price" class="form-control" step="0.01" min="0">
-                                </th>
-                                <th>
-                                    <input type="number" name="price_selling_price" id="price_selling_price" class="form-control" step="0.01" min="0" required>
-                                </th>
-                                <th>
-                                    <input type="date" name="price_effective_from" id="price_effective_from" class="form-control">
-                                </th>
-                                <th>
-                                    <input type="date" name="price_effective_to" id="price_effective_to" class="form-control">
-                                </th>
-                                <th>
-                                    <select name="price_is_active" id="price_is_active" class="form-control">
-                                        <option value="1">Active</option>
-                                        <option value="0">Inactive</option>
-                                    </select>
-                                </th>
-                                <th class="text-end">
-                                    <button type="button" id="priceSubmitBtn" class="btn btn-sm btn-primary" style="font-size: 12px;padding: 0.15rem 0.3rem;" onclick="addPrice()"><i class="bi bi-plus-circle"></i> Add</button>
-                                    <button type="button" id="priceCancelBtn" class="btn btn-sm btn-secondary" style="font-size: 12px;padding: 0.15rem 0.3rem; display: none;" onclick="cancelPriceEdit()"><i class="bi bi-x-circle"></i> Cancel</button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="priceTableBody">
-                            <tr>
-                                <td colspan="9" class="text-center text-muted">No prices found. Add a price to get started.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<!-- Manage Discount Tab -->
+<div class="tab-pane fade" id="manageDiscount" role="tabpanel" aria-labelledby="managediscount-tab">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="discountTable">
+                    <thead>
+                        <tr>
+                            <th>Discount Type</th>
+                            <th>Discount Value</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Min Order Amount</th>
+                            <th>Max Discount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="discountTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Loading discounts...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-    <!-- Manage Discount Tab -->
-    <div class="tab-pane fade" id="manageDiscount" role="tabpanel" aria-labelledby="managediscount-tab">
-        <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm" id="discountTable">
-                        <thead>
-                            <tr>
-                                <th>Discount Type</th>
-                                <th>Discount Value</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Min Order Amount</th>
-                                <th>Max Discount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="discountTableBody">
-                            <tr>
-                                <td colspan="7" class="text-center text-muted">Loading discounts...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 </div>
 </div>
 </div>

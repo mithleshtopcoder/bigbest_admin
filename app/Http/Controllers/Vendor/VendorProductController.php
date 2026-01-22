@@ -324,20 +324,18 @@ public function updateInfo(Request $request, $id)
     DB::beginTransaction();
 
     try {
-        $product = Product::findOrFail($id); // product-id wise only
+        $product = Product::findOrFail($id);
 
         $validated = $request->validate([
-            'unit'                => 'required|string',
-            'weight_unit'         => 'required|string',
-            'status'              => 'required|in:active,inactive',
-
-            'min_order_quantity'  => 'nullable|integer|min:1',
-            'max_order_quantity'  => 'nullable|integer|min:1',
-
-            'weight'              => 'nullable|numeric|min:0',
-            'length'              => 'nullable|numeric|min:0',
-            'width'               => 'nullable|numeric|min:0',
-            'height'              => 'nullable|numeric|min:0',
+            'unit'               => 'required|string',
+            'weight_unit'        => 'required|string',
+            'status'             => 'required|in:active,inactive',
+            'min_order_quantity' => 'nullable|integer|min:1',
+            'max_order_quantity' => 'nullable|integer|min:1',
+            'weight'             => 'nullable|numeric|min:0',
+            'length'             => 'nullable|numeric|min:0',
+            'width'              => 'nullable|numeric|min:0',
+            'height'             => 'nullable|numeric|min:0',
         ]);
 
         $product->update($validated);
@@ -353,6 +351,7 @@ public function updateInfo(Request $request, $id)
         return back()->withErrors(['error' => $e->getMessage()]);
     }
 }
+
 
 
     public function destroy(Product $product)
