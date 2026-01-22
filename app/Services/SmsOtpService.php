@@ -6,13 +6,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Customer;
+use App\Jobs\SendSmsJob;
 use Exception;
 
 class SmsOtpService
 {
-    /**
-     * List of SMS templates
-     */
     protected array $templates = [
         'otp_login' => [
             'template_id' => '1707176906714045127',
@@ -26,9 +24,13 @@ class SmsOtpService
             'template_id' => '1707181111111111',
             'message' => 'Hi {name}, you left items in your cart. Complete your purchase before it expires!'
         ],
-        
     ];
 
+    protected int $otpExpiry = 20; // minutes
+
+    /**
+     * Generate OTP, store in cache, and dispatch SMS synchronously
+     */
     public function sendOtp(string $phone, string $flow = 'login'): array
     {
         $user = Customer::where('phone', $phone)->first();
@@ -43,13 +45,13 @@ class SmsOtpService
 
         $otp = $this->generateOtp();
 
-        // Store OTP for 20 minutes
-        Cache::put($this->otpKey($phone), $otp, now()->addMinutes(20));
+        // Store OTP in cache
+        Cache::put($this->otpKey($phone), $otp, now()->addMinutes($this->otpExpiry));
 
-        // Send SMS using otp_login template
-        $this->sendSms($phone, 'otp_login', [
+        // Dispatch SMS synchronously (no queue worker needed)
+        $this->sendSmsJob('otp_login', $phone, [
             'otp' => $otp,
-            'minutes' => 20,
+            'minutes' => $this->otpExpiry,
             'name' => $user ? trim($user->full_name) : 'Guest',
         ]);
 
@@ -60,23 +62,22 @@ class SmsOtpService
         ];
     }
 
+    /**
+     * Verify OTP
+     */
     public function verifyOtp(string $phone, string $otp, string $flow = 'login'): array
     {
         $storedOtp = Cache::get($this->otpKey($phone));
 
-        if (!$storedOtp || !hash_equals((string) $storedOtp, (string) $otp)) {
+        if (!$storedOtp || !hash_equals((string)$storedOtp, (string)$otp)) {
             throw new Exception('Invalid or expired OTP', 400);
         }
 
-        // Clear OTP from cache
         Cache::forget($this->otpKey($phone));
 
         if ($flow === 'login') {
             $user = Customer::where('phone', $phone)->first();
-
-            if (!$user) {
-                throw new Exception('User not found', 404);
-            }
+            if (!$user) throw new Exception('User not found', 404);
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -93,19 +94,33 @@ class SmsOtpService
         ];
     }
 
-    public function sendSms(string $phone, string $templateKey, array $data = []): bool
+    /**
+     * Dispatch SMS synchronously (runs immediately, no queue)
+     */
+    public function sendSmsJob(string $templateKey, string $phone, array $data = []): void
     {
         if (!isset($this->templates[$templateKey])) {
-            Log::error("SMS template not found: {$templateKey}");
-            return false;
+            throw new Exception("SMS template not found: {$templateKey}");
+        }
+
+        // Dispatch job immediately (synchronous)
+        SendSmsJob::dispatchSync($templateKey, $phone, $data);
+    }
+
+    /**
+     * Send SMS directly (used by the job)
+     */
+    public function send(string $templateKey, string $phone, array $data = []): bool
+    {
+        if (!isset($this->templates[$templateKey])) {
+            throw new Exception("SMS template not found: {$templateKey}");
         }
 
         $template = $this->templates[$templateKey];
-
-        // Replace placeholders in template message
         $message = $template['message'];
+
         foreach ($data as $key => $value) {
-            $message = str_replace('{' . $key . '}', $value, $message);
+            $message = str_replace("{" . $key . "}", $value, $message);
         }
 
         $smsUrl = env('SMPP_URL', 'http://smpp.webtechsolution.co/http-api.php');
@@ -124,11 +139,13 @@ class SmsOtpService
 
         try {
             $response = Http::get($finalUrl);
+
             Log::info('SMS sent', [
                 'phone' => $phone,
                 'template' => $templateKey,
                 'response' => $response->body(),
             ]);
+
             return $response->successful();
         } catch (Exception $e) {
             Log::error('SMS sending failed', [
@@ -136,6 +153,7 @@ class SmsOtpService
                 'template' => $templateKey,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
