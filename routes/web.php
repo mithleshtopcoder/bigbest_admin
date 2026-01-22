@@ -738,13 +738,14 @@ Route::middleware(['auth', 'vendor'])
         Route::get('/products/{product}/edit', [VendorProductController::class, 'edit'])
             ->name('products.edit');
 
-        // Update product
-        Route::put('/products/{product}', [VendorProductController::class, 'update'])
+     // Normal full update
+Route::put('/products/{product}', [VendorProductController::class, 'update'])
     ->name('products.update');
 
 // Extra info update (your form)
 Route::put('/products/{product}/update-info', [VendorProductController::class, 'updateInfo'])
     ->name('products.updateinfo');
+
 
         // Delete product
         Route::delete('/products/{product}', [VendorProductController::class, 'destroy'])
