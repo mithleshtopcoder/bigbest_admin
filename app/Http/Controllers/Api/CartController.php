@@ -44,31 +44,37 @@ class CartController extends Controller
     /**
      * Get customer's cart
      */
-   public function index(Request $request, CartPricingService $pricingService)
+public function index(Request $request, CartPricingService $pricingService)
 {
     $customer = $request->user();
-    $latitude = $request->query('latitude');
-    $longitude = $request->query('longitude');
 
-    $nearestStore = $this->findNearestStore($latitude, $longitude);
-    $storeId = $nearestStore ? $nearestStore->id : null;
+    $cartItems = Cart::where('customer_id', $customer->id)
+        ->with(['productVariant.product.vendor']) // ✅ correct eager loading
+        ->get();
 
-    $query = Cart::where('customer_id', $customer->id)
-        ->with(['productVariant.product', 'store']);
-
-    if ($storeId) {
-        $query->where('store_id', $storeId);
-    }
-
-    $cartItems = $query->get();
-
-    // ✅ CENTRALIZED PRICING (AppSettings based)
-    $pricing = $pricingService->calculate($cartItems, $nearestStore);
+    // ✅ CENTRALIZED PRICING
+    $pricing = $pricingService->calculate($cartItems, null);
 
     return response()->json([
         'success' => true,
         'data' => [
-            'items' => $cartItems,
+            'items' => $cartItems->map(function ($item) {
+                $product = $item->productVariant->product;
+
+                return [
+                    'id' => $item->id,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                    'total_price' => $item->total_price,
+                    'notes' => $item->notes,
+                    'product' => [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'vendor_id' => $product->vendor_id, // ✅ FIX
+                        'vendor_name' => optional($product->vendor)->name,
+                    ],
+                ];
+            }),
             'summary' => [
                 'total_items'        => $cartItems->sum('quantity'),
                 'subtotal'           => $pricing['subtotal'],
@@ -76,146 +82,104 @@ class CartController extends Controller
                 'tax_amount'         => $pricing['tax_amount'],
                 'shipping_charge'    => $pricing['shipping_charge'],
                 'grand_total'        => $pricing['grand_total'],
-
-                // Validation helpers
                 'min_order_amount'   => $pricing['min_order_amount'],
                 'is_min_order_met'   => $pricing['is_min_order_met'],
                 'free_delivery_above'=> $pricing['free_delivery_above'],
-
                 'currency_symbol'    => $pricing['currency_symbol'],
             ]
-        ],
-        'nearest_store' => $nearestStore ? [
-            'id'       => $nearestStore->id,
-            'name'     => $nearestStore->name,
-            'distance' => round($nearestStore->distance, 2) . ' km',
-        ] : null
+        ]
     ], 200);
 }
+
 
     /**
      * Add item to cart
      */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'product_variant_id' => 'required|exists:product_variants,id',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'quantity' => 'required|integer|min:1',
+   public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'product_variant_id' => 'required|exists:product_variants,id',
+        'quantity' => 'required|integer|min:1',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $customer = $request->user();
+    $productVariant = ProductVariant::findOrFail($request->product_variant_id);
+
+    // Get vendor ID from product
+    $vendorId = $productVariant->product->vendor_id;
+
+    // Get current price
+    $currentPrice = $productVariant->prices()
+        ->where('is_active', true)
+        ->where(function($q) {
+            $q->whereNull('effective_from')->orWhere('effective_from', '<=', now());
+        })
+        ->where(function($q) {
+            $q->whereNull('effective_to')->orWhere('effective_to', '>=', now());
+        })
+        ->orderBy('effective_from', 'desc')
+        ->first();
+
+    if (!$currentPrice) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Product price not available'
+        ], 400);
+    }
+
+    $unitPrice = $currentPrice->price;
+    $totalPrice = $unitPrice * $request->quantity;
+
+    // Check if item already exists in cart
+    $cartItem = Cart::where('customer_id', $customer->id)
+        ->where('product_variant_id', $productVariant->id)
+        ->first();
+
+    if ($cartItem) {
+        $newQuantity = $cartItem->quantity + $request->quantity;
+        $cartItem->update([
+            'quantity' => $newQuantity,
+            'total_price' => $unitPrice * $newQuantity,
+            'vendor_id' => $vendorId, // update vendor_id if necessary
         ]);
+    } else {
+        $cartItem = Cart::create([
+            'customer_id' => $customer->id,
+            'product_variant_id' => $productVariant->id,
+            'quantity' => $request->quantity,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'vendor_id' => $vendorId, // ✅ save vendor_id
+            'notes' => $request->notes,
+        ]);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $customer = $request->user();
-        
-        // Find nearest store
-        $nearestStore = $this->findNearestStore($request->latitude, $request->longitude);
-        
-        if (!$nearestStore) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No active store found near your location'
-            ], 400);
-        }
-
-        $storeId = $nearestStore->id;
-        $productVariant = ProductVariant::findOrFail($request->product_variant_id);
-
-        // Check stock availability
-        $stock = ProductStock::where('product_variant_id', $productVariant->id)
-            ->where('store_id', $storeId)
-            ->first();
-
-        // if (!$stock || $stock->quantity < $request->quantity) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Insufficient stock available'
-        //     ], 400);
-        // }
-
-        // TEMPORARY: allow cart add without stock check
-if (!$stock) {
-    $stockQuantity = 0;
-} else {
-    $stockQuantity = $stock->quantity;
+    return response()->json([
+        'success' => true,
+        'message' => 'Item added to cart successfully',
+        'data' => [
+            'id' => $cartItem->id,
+            'quantity' => $cartItem->quantity,
+            'unit_price' => $cartItem->unit_price,
+            'total_price' => $cartItem->total_price,
+            'notes' => $cartItem->notes,
+            'product' => [
+                'id' => $productVariant->product->id,
+                'name' => $productVariant->product->name,
+                'vendor_id' => $vendorId,
+            ],
+        ]
+    ], 201);
 }
 
-        // Get current price
-        $currentPrice = $productVariant->prices()
-            ->where('is_active', true)
-            ->where(function($q) {
-                $q->whereNull('effective_from')
-                  ->orWhere('effective_from', '<=', now());
-            })
-            ->where(function($q) {
-                $q->whereNull('effective_to')
-                  ->orWhere('effective_to', '>=', now());
-            })
-            ->orderBy('effective_from', 'desc')
-            ->first();
-
-        if (!$currentPrice) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Product price not available'
-            ], 400);
-        }
-
-        $unitPrice = $currentPrice->price;
-        $totalPrice = $unitPrice * $request->quantity;
-
-        // Check if item already exists in cart
-        $cartItem = Cart::where('customer_id', $customer->id)
-            ->where('product_variant_id', $productVariant->id)
-            ->where('store_id', $storeId)
-            ->first();
-
-        if ($cartItem) {
-            // Update quantity
-            $newQuantity = $cartItem->quantity + $request->quantity;
-            
-            // if ($stock->quantity < $newQuantity) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Insufficient stock available'
-            //     ], 400);
-            // }
-
-            $cartItem->update([
-                'quantity' => $newQuantity,
-                'total_price' => $unitPrice * $newQuantity,
-            ]);
-        } else {
-            // Create new cart item
-            $cartItem = Cart::create([
-                'customer_id' => $customer->id,
-                'product_variant_id' => $productVariant->id,
-                'store_id' => $storeId,
-                'quantity' => $request->quantity,
-                'unit_price' => $unitPrice,
-                'total_price' => $totalPrice,
-                'notes' => $request->notes,
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Item added to cart successfully',
-            'data' => $cartItem->load(['productVariant.product', 'store']),
-            'nearest_store' => [
-                'id' => $nearestStore->id,
-                'name' => $nearestStore->name,
-                'distance' => round($nearestStore->distance, 2) . ' km',
-            ]
-        ], 201);
-    }
 
     /**
      * Update cart item

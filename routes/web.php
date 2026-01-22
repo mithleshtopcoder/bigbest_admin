@@ -52,6 +52,10 @@ use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorKycController;
 use App\Http\Controllers\Admin\VendorPayoutController;
 use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\VendorProductVariantController;
+use App\Http\Controllers\Vendor\VendorProductStockController;
+use App\Http\Controllers\Vendor\VendorProductImageController;
+
 
 
 
@@ -738,26 +742,72 @@ Route::middleware(['auth', 'vendor'])
         Route::get('/products/{product}/edit', [VendorProductController::class, 'edit'])
             ->name('products.edit');
 
-     // Normal full update
-Route::put('/products/{product}', [VendorProductController::class, 'update'])
-    ->name('products.update');
+        // Normal full update
+        Route::put('/products/{product}', [VendorProductController::class, 'update'])
+            ->name('products.update');
 
-// Extra info update (your form)
-Route::put('/products/{product}/update-info', [VendorProductController::class, 'updateInfo'])
-    ->name('products.updateinfo');
-
+        // Extra info update (your form)
+        Route::put('/products/{product}/update-info', [VendorProductController::class, 'updateInfo'])
+            ->name('products.updateinfo');
 
         // Delete product
         Route::delete('/products/{product}', [VendorProductController::class, 'destroy'])
             ->name('products.destroy');
+
+        // ---------------- Variant Routes ----------------
+        Route::prefix('products/{product}/variants')
+            ->name('products.variants.')
+            ->group(function () {
+
+                // List variants
+                Route::get('/', [VendorProductVariantController::class, 'index'])
+                    ->name('index');
+
+                // Store new variant
+                Route::post('/store', [VendorProductVariantController::class, 'store'])
+                    ->name('store');
+
+                // Update variant
+                Route::put('/update/{variant}', [VendorProductVariantController::class, 'update'])
+                    ->name('update');
+
+                // Delete variant
+                Route::delete('/delete/{variant}', [VendorProductVariantController::class, 'destroy'])
+                    ->name('delete');
+
+                // Variant images
+                Route::prefix('{variant}/images')->name('images.')->group(function () {
+                    Route::get('/', [VendorProductImageController::class, 'index'])
+                        ->name('index');
+
+                    Route::post('/store', [VendorProductImageController::class, 'store'])
+                        ->name('store');
+
+                    Route::put('/{image}/set-primary', [VendorProductImageController::class, 'setPrimary'])
+                        ->name('set-primary');
+
+                    Route::delete('/{image}/delete', [VendorProductImageController::class, 'destroy'])
+                        ->name('delete');
+                });
+
+                // Variant stocks
+                Route::get('/stocks', [VendorProductStockController::class, 'variantStocks'])
+                    ->name('stocks');
+            });
+
+        // Orders
         Route::get('/orders', [VendorOrderController::class, 'index'])
             ->name('orders.index');
+
+        // Payouts
         Route::get('/payouts', [VendorPayoutController::class, 'index'])
             ->name('payouts.index');
 
+        // Profile
         Route::get('/profile', [VendorProfileController::class, 'index'])
             ->name('profile');
     });
+
 
 
 

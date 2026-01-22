@@ -161,6 +161,10 @@ public function payableAmount()
 
     return $totalEarnings - $totalPaid;
 }
+public function vendor()
+{
+    return $this->belongsTo(User::class, 'vendor_id', 'vendor_id');
+}
 
     /**
      * Get all permissions through roles (using Spatie's method)

@@ -24,6 +24,7 @@ class OrderItem extends Model
         'status',
         'notes',
         'sort_order',
+        'vendor_id',
     ];
 
     protected function casts(): array
@@ -52,5 +53,8 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductVariant::class);
     }
-    
+    public function vendor()
+{
+    return $this->belongsTo(User::class, 'vendor_id', 'vendor_id');
+}
 }

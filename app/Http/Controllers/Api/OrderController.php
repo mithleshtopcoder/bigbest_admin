@@ -94,6 +94,8 @@ class OrderController extends Controller
      */
 public function store(Request $request)
 {
+    // dd($request->all(), $request->header('content-type'), $request->user());
+
     $validator = Validator::make($request->all(), [
         'delivery_address_id' => 'required|exists:customer_addresses,id',
         'payment_method' => 'required|in:cash_on_delivery,online,wallet,card,upi,netbanking',
@@ -246,6 +248,8 @@ public function store(Request $request)
                 'total_price' => $cartItem->total_price,
                 'tax_amount' => ($cartItem->total_price * $pricing['tax_percent']) / 100,
                 'status' => 'pending',
+               'vendor_id' => $cartItem->productVariant->product->vendor_id,
+
             ]);
 
             $stock = ProductStock::where('product_variant_id', $cartItem->product_variant_id)
@@ -293,8 +297,24 @@ MyHelper::createNotification(
 return response()->json([
     'success' => true,
     'message' => 'Order placed successfully',
-    'data' => $order->fresh()
+    'data' => [
+        'order_id' => $order->id,
+        'order_number' => $order->order_number,
+        'total_amount' => $order->total_amount,
+        'payment_status' => $order->payment_status,
+        'status' => $order->status,
+        'items' => $order->items->map(function ($item) {
+            return [
+                'product_name' => $item->product_name,
+                'variant_name' => $item->variant_name,
+                'quantity' => $item->quantity,
+                'total_price' => $item->total_price,
+                'vendor_id' => $item->vendor_id,
+            ];
+        }),
+    ]
 ], 201);
+
 
     } catch (\Exception $e) {
         DB::rollBack();

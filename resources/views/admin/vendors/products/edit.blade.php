@@ -761,7 +761,7 @@
 
         if (compareAtPrice > 0 && sellingPrice > 0 && compareAtPrice > sellingPrice) {
             const discount = ((compareAtPrice - sellingPrice) / compareAtPrice) * 100;
-            // You can display this in a tooltip or hidden field if needed
+            // Optional: display this value somewhere
         }
     }
 
@@ -783,19 +783,7 @@
         });
 
         // Auto-generate SKU when variant name, code, or unit value changes
-        $('input[name="variant_name"]').on('input', function() {
-            if (!skuManuallyEdited && !editingVariantId) {
-                generateSku();
-            }
-        });
-
-        $('input[name="variant_code"]').on('input', function() {
-            if (!skuManuallyEdited && !editingVariantId) {
-                generateSku();
-            }
-        });
-
-        $('input[name="variant_unit_value"]').on('input', function() {
+        $('input[name="variant_name"], input[name="variant_code"], input[name="variant_unit_value"]').on('input', function() {
             if (!skuManuallyEdited && !editingVariantId) {
                 generateSku();
             }
@@ -803,160 +791,79 @@
 
         // Track manual SKU edits
         $('input[name="variant_sku"]').on('input', function() {
-            if ($(this).val().length > 0) {
-                skuManuallyEdited = true;
-            }
-            // Auto-generate barcode when SKU changes
-            if (!barcodeManuallyEdited && !editingVariantId) {
-                generateBarcode();
-            }
+            if ($(this).val().length > 0) skuManuallyEdited = true;
+            if (!barcodeManuallyEdited && !editingVariantId) generateBarcode();
         });
 
         // Track manual barcode edits
         $('input[name="variant_barcode"]').on('input', function() {
-            if ($(this).val().length > 0) {
-                barcodeManuallyEdited = true;
-            }
+            if ($(this).val().length > 0) barcodeManuallyEdited = true;
         });
     });
 
-    // Generate SKU based on product SKU, variant name, and code
+    // Generate SKU
     function generateSku() {
         const name = $('input[name="variant_name"]').val().trim();
         const code = $('input[name="variant_code"]').val().trim();
+        if (!name) return;
 
-        if (!name) {
-            return;
-        }
+        let sku = productSku ? productSku + '-' : '';
 
-        let sku = '';
-
-        // Use product SKU as base if available
-        if (productSku) {
-            sku = productSku + '-';
-        }
-
-        // Add code if available, otherwise use name
         if (code) {
             sku += code.toUpperCase().replace(/\s+/g, '-');
         } else {
-            // Generate from name: take first 3-4 letters of each word
             const nameParts = name.split(/\s+/);
-            const skuParts = nameParts.map(part => {
-                return part.substring(0, 3).toUpperCase();
-            });
+            const skuParts = nameParts.map(part => part.substring(0, 3).toUpperCase());
             sku += skuParts.join('-');
         }
 
-        // Add unit value if available
         const unitValue = $('input[name="variant_unit_value"]').val().trim();
-        if (unitValue) {
-            sku += '-' + unitValue.replace(/\s+/g, '');
-        }
-
-        // Clean up SKU (remove special characters, keep only alphanumeric and hyphens)
+        if (unitValue) sku += '-' + unitValue.replace(/\s+/g, '');
         sku = sku.replace(/[^A-Z0-9-]/g, '').toUpperCase();
-
         $('input[name="variant_sku"]').val(sku);
     }
 
-    // Generate barcode based on SKU
+    // Generate barcode
     function generateBarcode() {
         const sku = $('input[name="variant_sku"]').val().trim();
+        if (!sku) return;
 
-        if (!sku) {
-            return;
-        }
-
-        // Generate a numeric barcode from SKU
-        // Convert SKU to a numeric string by hashing characters
         let barcode = '';
-
-        // Remove all non-alphanumeric characters first
         const cleanSku = sku.replace(/[^A-Z0-9]/gi, '');
-
         for (let i = 0; i < cleanSku.length; i++) {
             const char = cleanSku[i];
-            if (char >= '0' && char <= '9') {
-                barcode += char;
-            } else if ((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z')) {
-                // Convert letter to number (A=1, B=2, ..., Z=26)
+            if (char >= '0' && char <= '9') barcode += char;
+            else {
                 const charCode = char.toUpperCase().charCodeAt(0);
-                if (charCode >= 65 && charCode <= 90) {
-                    const num = charCode - 64;
-                    barcode += num.toString().padStart(2, '0');
-                }
+                if (charCode >= 65 && charCode <= 90) barcode += (charCode - 64).toString().padStart(2, '0');
             }
         }
 
-        // Ensure we have at least 8 digits, pad with product ID if needed
-        if (barcode.length < 8) {
-            const productIdStr = productId ? productId.toString() : '0000';
-            barcode = barcode + productIdStr.padStart(4, '0');
-        }
+        if (barcode.length < 8) barcode += productId.toString().padStart(4, '0');
+        if (barcode.length < 13) barcode = barcode.padEnd(13, '0');
+        else if (barcode.length > 12) barcode = barcode.substring(0, 12);
 
-        // Take first 13 digits for EAN-13 format, or pad to 13
-        if (barcode.length < 13) {
-            // Pad with zeros at the end
-            barcode = barcode.padEnd(13, '0');
-        } else if (barcode.length > 13) {
-            // Take first 12 digits for check digit calculation
-            barcode = barcode.substring(0, 12);
-        }
-
-        // Calculate EAN-13 check digit
         let sum = 0;
         for (let i = 0; i < 12 && i < barcode.length; i++) {
             const digit = parseInt(barcode[i], 10);
-            if (!isNaN(digit)) {
-                sum += (i % 2 === 0) ? digit : digit * 3;
-            }
+            sum += (i % 2 === 0) ? digit : digit * 3;
         }
-
-        // Ensure sum is valid before calculating check digit
-        if (isNaN(sum)) {
-            // Fallback: use a simple numeric hash
-            let hash = 0;
-            for (let i = 0; i < sku.length; i++) {
-                hash = ((hash << 5) - hash) + sku.charCodeAt(i);
-                hash = hash & hash; // Convert to 32bit integer
-            }
-            barcode = Math.abs(hash).toString().padStart(13, '0').substring(0, 12);
-            sum = 0;
-            for (let i = 0; i < 12; i++) {
-                const digit = parseInt(barcode[i], 10);
-                sum += (i % 2 === 0) ? digit : digit * 3;
-            }
-        }
-
         const checkDigit = (10 - (sum % 10)) % 10;
         barcode = barcode.substring(0, 12) + checkDigit;
 
-        // Final validation - ensure barcode is all digits
-        if (/^\d+$/.test(barcode) && barcode.length === 13) {
-            $('input[name="variant_barcode"]').val(barcode);
-        } else {
-            // Last resort: generate a simple numeric barcode
-            const fallbackBarcode = Math.abs(sku.split('').reduce((acc, char) => {
-                return acc + char.charCodeAt(0);
-            }, 0)).toString().padStart(13, '0').substring(0, 13);
-            $('input[name="variant_barcode"]').val(fallbackBarcode);
-        }
+        $('input[name="variant_barcode"]').val(/^\d+$/.test(barcode) ? barcode : barcode.padEnd(13, '0'));
     }
 
     // Variant Image Management
     let currentVariantId = null;
 
-    // Load all variants via AJAX
+    // Load all variants via vendor route
     function loadVariants() {
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants`
+            url: `/vendor/products/${productId}/variants`
             , method: 'GET'
             , success: function(response) {
-                if (response.success) {
-                    // The variants already have images_count from withCount('images')
-                    renderVariants(response.data);
-                }
+                if (response.success) renderVariants(response.data);
             }
             , error: function(xhr) {
                 console.error('Error loading variants:', xhr);
@@ -975,15 +882,13 @@
         modal.show();
     }
 
-    // Load variant images
+    // Load variant images via vendor route
     function loadVariantImages(variantId) {
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants/${variantId}/images`
+            url: `/vendor/products/${productId}/variants/${variantId}/images`
             , method: 'GET'
             , success: function(response) {
-                if (response.success) {
-                    renderVariantImages(response.data);
-                }
+                if (response.success) renderVariantImages(response.data);
             }
             , error: function(xhr) {
                 console.error('Error loading images:', xhr);
@@ -992,21 +897,19 @@
         });
     }
 
-    // Render variant images in modal
+    // Render variant images
     function renderVariantImages(images) {
         const container = $('#variantImagesContainer');
         container.empty();
-
         if (images.length === 0) {
-            container.append('<div class="col-12 text-center text-muted"><p>No images found. Upload images to get started.</p></div>');
+            container.append('<div class="col-12 text-center text-muted"><p>No images found.</p></div>');
             return;
         }
-
-        images.forEach((image, index) => {
-            const imageCard = `
+        images.forEach((image) => {
+            container.append(`
                 <div class="col-md-3">
                     <div class="card position-relative">
-                        <img src="${image.image_path}" class="card-img-top" alt="${image.alt_text || 'Variant Image'}" style="height: 150px; object-fit: cover;">
+                        <img src="${image.image_path}" class="card-img-top" style="height:150px;object-fit:cover;">
                         <div class="card-body p-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="primary_image" value="${image.id}" ${image.is_primary ? 'checked' : ''} onchange="setPrimaryImage(${image.id})">
@@ -1020,34 +923,22 @@
                         </div>
                     </div>
                 </div>
-            `;
-            container.append(imageCard);
+            `);
         });
     }
 
     // Upload variant images
     function uploadVariantImages() {
         const files = $('#variantImageUpload')[0].files;
-
-        if (files.length === 0) {
-            showAlert('Please select at least one image to upload', 'warning');
-            return;
-        }
-
-        if (!currentVariantId) {
-            showAlert('Variant ID is missing', 'danger');
-            return;
-        }
+        if (!files.length || !currentVariantId) return showAlert('Select images first', 'warning');
 
         const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append('images[]', files[i]);
-        }
+        for (let i = 0; i < files.length; i++) formData.append('images[]', files[i]);
         formData.append('product_variant_id', currentVariantId);
         formData.append('product_id', productId);
 
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants/${currentVariantId}/images/store`
+            url: `/vendor/products/${productId}/variants/${currentVariantId}/images/store`
             , method: 'POST'
             , data: formData
             , processData: false
@@ -1060,19 +951,13 @@
                     showAlert(response.message, 'success');
                     $('#variantImageUpload').val('');
                     loadVariantImages(currentVariantId);
-                    loadVariants(); // Refresh variant list to update image count
-                } else {
-                    showAlert(response.message || 'Upload failed', 'danger');
-                }
+                    loadVariants();
+                } else showAlert(response.message || 'Upload failed', 'danger');
             }
             , error: function(xhr) {
                 let errorMsg = 'Upload failed';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    const errors = Object.values(xhr.responseJSON.errors).flat();
-                    errorMsg = errors.join('<br>');
-                }
+                if (xhr.responseJSON ? .message) errorMsg = xhr.responseJSON.message;
+                else if (xhr.responseJSON ? .errors) errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
                 showAlert(errorMsg, 'danger');
             }
         });
@@ -1081,15 +966,13 @@
     // Set primary image
     function setPrimaryImage(imageId) {
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants/${currentVariantId}/images/${imageId}/set-primary`
+            url: `/vendor/products/${productId}/variants/${currentVariantId}/images/${imageId}/set-primary`
             , method: 'PUT'
             , headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
             , success: function(response) {
-                if (response.success) {
-                    loadVariantImages(currentVariantId);
-                }
+                if (response.success) loadVariantImages(currentVariantId);
             }
             , error: function(xhr) {
                 showAlert('Error setting primary image', 'danger');
@@ -1099,12 +982,10 @@
 
     // Delete variant image
     function deleteVariantImage(imageId) {
-        if (!confirm('Are you sure you want to delete this image?')) {
-            return;
-        }
+        if (!confirm('Are you sure you want to delete this image?')) return;
 
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants/${currentVariantId}/images/${imageId}/delete`
+            url: `/vendor/products/${productId}/variants/${currentVariantId}/images/${imageId}/delete`
             , method: 'DELETE'
             , headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1113,10 +994,8 @@
                 if (response.success) {
                     showAlert(response.message, 'success');
                     loadVariantImages(currentVariantId);
-                    loadVariants(); // Refresh variant list to update image count
-                } else {
-                    showAlert(response.message || 'Delete failed', 'danger');
-                }
+                    loadVariants();
+                } else showAlert(response.message || 'Delete failed', 'danger');
             }
             , error: function(xhr) {
                 showAlert('Error deleting image', 'danger');
@@ -1124,20 +1003,15 @@
         });
     }
 
-    // Render variants in the table
+    // Render variants in table
     function renderVariants(variants) {
         const tbody = $('#variantTableBody');
         tbody.empty();
-
-        if (variants.length === 0) {
-            tbody.append('<tr><td colspan="10" class="text-center text-muted">No variants found</td></tr>');
-            return;
-        }
+        if (!variants.length) return tbody.append('<tr><td colspan="10" class="text-center text-muted">No variants found</td></tr>');
 
         variants.forEach((variant, index) => {
-            const imageCount = variant.images_count || 0;
-            const imageBadge = imageCount > 0 ? `<span class="badge bg-light text-dark ms-1">${imageCount}</span>` : '';
-            const row = `
+            const imageBadge = variant.images_count > 0 ? `<span class="badge bg-light text-dark ms-1">${variant.images_count}</span>` : '';
+            tbody.append(`
                 <tr class="variant-row" data-id="${variant.id}">
                     <td>${index + 1}</td>
                     <td>${variant.name || '-'}</td>
@@ -1147,35 +1021,22 @@
                     <td>${variant.unit_value || '-'}</td>
                     <td>${variant.barcode || '-'}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-info" onclick="openVariantImageModal(${variant.id}, '${(variant.name || '').replace(/'/g, "\\'")}')" title="Manage Images">
+                        <button type="button" class="btn btn-sm btn-info" onclick="openVariantImageModal(${variant.id}, '${(variant.name || '').replace(/'/g,"\\'")}')" title="Manage Images">
                             <i class="bi bi-image"></i>${imageBadge}
                         </button>
                     </td>
-                    <td>
-                        <span class="badge ${variant.is_default ? 'bg-success' : 'bg-secondary'}">
-                            ${variant.is_default ? 'Yes' : 'No'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge ${variant.is_active ? 'bg-success' : 'bg-danger'}">
-                            ${variant.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                    </td>
+                    <td><span class="badge ${variant.is_default ? 'bg-success' : 'bg-secondary'}">${variant.is_default ? 'Yes' : 'No'}</span></td>
+                    <td><span class="badge ${variant.is_active ? 'bg-success' : 'bg-danger'}">${variant.is_active ? 'Active' : 'Inactive'}</span></td>
                     <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="editVariant(${variant.id})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteVariant(${variant.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="editVariant(${variant.id})"><i class="bi bi-pencil"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteVariant(${variant.id})"><i class="bi bi-trash"></i></button>
                     </td>
                 </tr>
-            `;
-            tbody.append(row);
+            `);
         });
     }
 
-    // Add or Update variant
+    // Add or update variant
     function addVariant() {
         const formData = {
             name: $('input[name="variant_name"]').val()
@@ -1189,16 +1050,11 @@
             , sort_order: 0
         };
 
-        // Validation
-        if (!formData.name || !formData.unit) {
-            showAlert('Variant Name and Unit are required', 'warning');
-            return;
-        }
+        if (!formData.name || !formData.unit) return showAlert('Variant Name and Unit are required', 'warning');
 
         const url = editingVariantId ?
-            `/manage-product/product-master/product/${productId}/variants/update/${editingVariantId}` :
-            `/manage-product/product-master/product/${productId}/variants/store`;
-
+            `/vendor/products/${productId}/variants/update/${editingVariantId}` :
+            `/vendor/products/${productId}/variants/store`;
         const method = editingVariantId ? 'PUT' : 'POST';
 
         $.ajax({
@@ -1213,53 +1069,44 @@
                     showAlert(response.message, 'success');
                     clearVariantForm();
                     loadVariants();
-                } else {
-                    showAlert(response.message || 'Operation failed', 'danger');
-                }
+                } else showAlert(response.message || 'Operation failed', 'danger');
             }
             , error: function(xhr) {
                 let errorMsg = 'Operation failed';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    const errors = Object.values(xhr.responseJSON.errors).flat();
-                    errorMsg = errors.join('<br>');
-                }
+                if (xhr.responseJSON ? .message) errorMsg = xhr.responseJSON.message;
+                else if (xhr.responseJSON ? .errors) errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
                 showAlert(errorMsg, 'danger');
             }
         });
     }
 
-    // Edit variant - populate form
+    // Edit variant
     function editVariant(id) {
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants`
+            url: `/vendor/products/${productId}/variants`
             , method: 'GET'
             , success: function(response) {
                 if (response.success) {
                     const variant = response.data.find(v => v.id === id);
-                    if (variant) {
-                        editingVariantId = variant.id;
-                        skuManuallyEdited = true; // Don't auto-generate when editing
-                        barcodeManuallyEdited = true; // Don't auto-generate when editing
-                        $('input[name="variant_name"]').val(variant.name);
-                        $('input[name="variant_code"]').val(variant.code || '');
-                        $('input[name="variant_sku"]').val(variant.sku || '');
-                        $('input[name="variant_barcode"]').val(variant.barcode || '');
-                        $('select[name="variant_unit"]').val(variant.unit);
-                        $('input[name="variant_unit_value"]').val(variant.unit_value || '');
-                        $('select[name="variant_is_default"]').val(variant.is_default ? '1' : '0');
-                        $('select[name="variant_is_active"]').val(variant.is_active ? '1' : '0');
+                    if (!variant) return;
+                    editingVariantId = variant.id;
+                    skuManuallyEdited = true;
+                    barcodeManuallyEdited = true;
 
-                        // Update button text
-                        $('#variantSubmitBtn').html('<i class="bi bi-check-circle"></i> Update');
-                        $('#variantCancelBtn').show();
+                    $('input[name="variant_name"]').val(variant.name);
+                    $('input[name="variant_code"]').val(variant.code || '');
+                    $('input[name="variant_sku"]').val(variant.sku || '');
+                    $('input[name="variant_barcode"]').val(variant.barcode || '');
+                    $('select[name="variant_unit"]').val(variant.unit);
+                    $('input[name="variant_unit_value"]').val(variant.unit_value || '');
+                    $('select[name="variant_is_default"]').val(variant.is_default ? '1' : '0');
+                    $('select[name="variant_is_active"]').val(variant.is_active ? '1' : '0');
 
-                        // Scroll to form
-                        $('html, body').animate({
-                            scrollTop: $('#variantInputRow').offset().top - 100
-                        }, 500);
-                    }
+                    $('#variantSubmitBtn').html('<i class="bi bi-check-circle"></i> Update');
+                    $('#variantCancelBtn').show();
+                    $('html, body').animate({
+                        scrollTop: $('#variantInputRow').offset().top - 100
+                    }, 500);
                 }
             }
             , error: function(xhr) {
@@ -1275,12 +1122,10 @@
 
     // Delete variant
     function deleteVariant(id) {
-        if (!confirm('Are you sure you want to delete this variant?')) {
-            return;
-        }
+        if (!confirm('Are you sure you want to delete this variant?')) return;
 
         $.ajax({
-            url: `/manage-product/product-master/product/${productId}/variants/delete/${id}`
+            url: `/vendor/products/${productId}/variants/delete/${id}`
             , method: 'DELETE'
             , headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1289,9 +1134,7 @@
                 if (response.success) {
                     showAlert(response.message, 'success');
                     loadVariants();
-                } else {
-                    showAlert(response.message || 'Delete failed', 'danger');
-                }
+                } else showAlert(response.message || 'Delete failed', 'danger');
             }
             , error: function(xhr) {
                 showAlert('Error deleting variant', 'danger');
@@ -1304,257 +1147,27 @@
         editingVariantId = null;
         skuManuallyEdited = false;
         barcodeManuallyEdited = false;
-        $('input[name="variant_name"]').val('');
-        $('input[name="variant_code"]').val('');
-        $('input[name="variant_sku"]').val('');
-        $('input[name="variant_barcode"]').val('');
+        $('input[name="variant_name"], input[name="variant_code"], input[name="variant_sku"], input[name="variant_barcode"], input[name="variant_unit_value"]').val('');
         $('select[name="variant_unit"]').val('piece');
-        $('input[name="variant_unit_value"]').val('');
         $('select[name="variant_is_default"]').val('0');
         $('select[name="variant_is_active"]').val('1');
-
-        // Reset button
         $('#variantSubmitBtn').html('<i class="bi bi-plus-circle"></i> Add');
         $('#variantCancelBtn').hide();
     }
 
-    // Show alert message
+    // Show alert
     function showAlert(message, type) {
         const alertClass = type === 'success' ? 'alert-success' :
             type === 'danger' ? 'alert-danger' :
             type === 'warning' ? 'alert-warning' : 'alert-info';
-
-        const alert = `
-            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-
-        // Remove existing alerts
+        const alert = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
         $('.alert').remove();
-
-        // Add new alert at the top of the form
         $('.main-body').prepend(alert);
-
-        // Auto dismiss after 3 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut(function() {
+        setTimeout(() => {
+            $('.alert').fadeOut(() => {
                 $(this).remove();
             });
         }, 3000);
-    }
-
-    // ==================== PRICE MANAGEMENT FUNCTIONS ====================
-
-    // Load all prices via AJAX
-    function loadPrices() {
-        $.ajax({
-            url: `/manage-product/product-master/product/${productId}/prices`
-            , method: 'GET'
-            , success: function(response) {
-                if (response.success) {
-                    renderPrices(response.data);
-                }
-            }
-            , error: function(xhr) {
-                console.error('Error loading prices:', xhr);
-                showAlert('Error loading prices', 'danger');
-            }
-        });
-    }
-
-    // Render prices in the table
-    function renderPrices(prices) {
-        const tbody = $('#priceTableBody');
-        tbody.empty();
-
-        if (prices.length === 0) {
-            tbody.append('<tr><td colspan="9" class="text-center text-muted">No prices found. Add a price to get started.</td></tr>');
-            return;
-        }
-
-        prices.forEach((price, index) => {
-            const variant = price.product_variant || {};
-            const row = `
-                <tr class="price-row" data-id="${price.id}">
-                    <td>${variant.name || '-'}</td>
-                    <td>${variant.sku || '-'}</td>
-                    <td>${price.cost_price ? '₹' + parseFloat(price.cost_price).toFixed(2) : '-'}</td>
-                    <td>${price.compare_at_price ? '₹' + parseFloat(price.compare_at_price).toFixed(2) : '-'}</td>
-                    <td>₹${parseFloat(price.price).toFixed(2)}</td>
-                    <td>${price.effective_from ? new Date(price.effective_from).toLocaleDateString() : '-'}</td>
-                    <td>${price.effective_to ? new Date(price.effective_to).toLocaleDateString() : '-'}</td>
-                    <td>
-                        <span class="badge ${price.is_active ? 'bg-success' : 'bg-danger'}">
-                            ${price.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                    </td>
-                    <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="editPrice(${price.id})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="deletePrice(${price.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-            tbody.append(row);
-        });
-    }
-
-    // Add or Update price
-    function addPrice() {
-        const formData = {
-            product_variant_id: $('#price_variant_id').val()
-            , cost_price: $('#price_cost_price').val() || null
-            , compare_at_price: $('#price_compare_at_price').val() || null
-            , price: $('#price_selling_price').val()
-            , effective_from: $('#price_effective_from').val() || null
-            , effective_to: $('#price_effective_to').val() || null
-            , is_active: $('#price_is_active').val() == '1' ? 1 : 0
-        , };
-
-        // Validation
-        if (!formData.product_variant_id || !formData.price) {
-            showAlert('Variant and Selling Price are required', 'warning');
-            return;
-        }
-
-        const url = editingPriceId ?
-            `/manage-product/product-master/product/${productId}/prices/update/${editingPriceId}` :
-            `/manage-product/product-master/product/${productId}/prices/store`;
-
-        const method = editingPriceId ? 'PUT' : 'POST';
-
-        $.ajax({
-            url: url
-            , method: method
-            , data: formData
-            , headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-            , success: function(response) {
-                if (response.success) {
-                    showAlert(response.message, 'success');
-                    clearPriceForm();
-                    loadPrices();
-                } else {
-                    showAlert(response.message || 'Operation failed', 'danger');
-                }
-            }
-            , error: function(xhr) {
-                let errorMsg = 'Operation failed';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    const errors = Object.values(xhr.responseJSON.errors).flat();
-                    errorMsg = errors.join('<br>');
-                }
-                showAlert(errorMsg, 'danger');
-            }
-        });
-    }
-
-    // Edit price - populate form
-    function editPrice(id) {
-        $.ajax({
-            url: `/manage-product/product-master/product/${productId}/prices`
-            , method: 'GET'
-            , success: function(response) {
-                if (response.success) {
-                    const price = response.data.find(p => p.id === id);
-                    if (price) {
-                        editingPriceId = price.id;
-                        const variant = price.product_variant || {};
-
-                        $('#price_variant_id').val(price.product_variant_id);
-                        $('#price_item_no').val(variant.sku || '');
-                        $('#price_cost_price').val(price.cost_price || '');
-                        $('#price_compare_at_price').val(price.compare_at_price || '');
-                        $('#price_selling_price').val(price.price);
-
-                        // Format dates for input
-                        if (price.effective_from) {
-                            const fromDate = new Date(price.effective_from);
-                            $('#price_effective_from').val(fromDate.toISOString().split('T')[0]);
-                        } else {
-                            $('#price_effective_from').val('');
-                        }
-
-                        if (price.effective_to) {
-                            const toDate = new Date(price.effective_to);
-                            $('#price_effective_to').val(toDate.toISOString().split('T')[0]);
-                        } else {
-                            $('#price_effective_to').val('');
-                        }
-
-                        $('#price_is_active').val(price.is_active ? '1' : '0');
-
-                        // Update button text
-                        $('#priceSubmitBtn').html('<i class="bi bi-check-circle"></i> Update');
-                        $('#priceCancelBtn').show();
-
-                        // Scroll to form
-                        $('html, body').animate({
-                            scrollTop: $('#priceInputRow').offset().top - 100
-                        }, 500);
-                    }
-                }
-            }
-            , error: function(xhr) {
-                showAlert('Error loading price data', 'danger');
-            }
-        });
-    }
-
-    // Cancel edit
-    function cancelPriceEdit() {
-        clearPriceForm();
-    }
-
-    // Delete price
-    function deletePrice(id) {
-        if (!confirm('Are you sure you want to delete this price?')) {
-            return;
-        }
-
-        $.ajax({
-            url: `/manage-product/product-master/product/${productId}/prices/delete/${id}`
-            , method: 'DELETE'
-            , headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-            , success: function(response) {
-                if (response.success) {
-                    showAlert(response.message, 'success');
-                    loadPrices();
-                } else {
-                    showAlert(response.message || 'Delete failed', 'danger');
-                }
-            }
-            , error: function(xhr) {
-                showAlert('Error deleting price', 'danger');
-            }
-        });
-    }
-
-    // Clear price form
-    function clearPriceForm() {
-        editingPriceId = null;
-        $('#price_variant_id').val('');
-        $('#price_item_no').val('');
-        $('#price_cost_price').val('');
-        $('#price_compare_at_price').val('');
-        $('#price_selling_price').val('');
-        $('#price_effective_from').val('');
-        $('#price_effective_to').val('');
-        $('#price_is_active').val('1');
-
-        // Reset button
-        $('#priceSubmitBtn').html('<i class="bi bi-plus-circle"></i> Add');
-        $('#priceCancelBtn').hide();
     }
 
 </script>

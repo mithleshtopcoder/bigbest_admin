@@ -72,6 +72,7 @@ class Order extends Model
         'shipping_charge',
         'discount_amount',
         'coupon_id',
+        'vendor_id',
         'loyalty_points_used',
         'wallet_amount_used',
         'total_amount',

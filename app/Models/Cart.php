@@ -17,6 +17,7 @@ class Cart extends Model
         'unit_price',
         'total_price',
         'notes',
+        'vendor_id',
     ];
 
     protected function casts(): array
