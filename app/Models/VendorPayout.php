@@ -22,6 +22,6 @@ class VendorPayout extends Model
     // Relation to the user/vendor
     public function vendor()
     {
-        return $this->belongsTo(User::class, 'vendor_id', 'id'); // your vendor_id links to users table
+        return $this->belongsTo(User::class, 'vendor_id', 'vendor_id'); // your vendor_id links to users table
     }
 }

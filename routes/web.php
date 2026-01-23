@@ -56,7 +56,7 @@ use App\Http\Controllers\Vendor\VendorProductVariantController;
 use App\Http\Controllers\Vendor\VendorProductStockController;
 use App\Http\Controllers\Vendor\VendorProductImageController;
 
-
+use App\Http\Controllers\Vendor\VendorDashboardController;
 
 
 
@@ -707,108 +707,30 @@ Route::prefix('admin/vendor-payouts')->name('vendor-payouts.')->group(function (
 
     Route::post('/{payout}/paid', [VendorPayoutController::class, 'markPaid'])
         ->name('paid');
+
+     Route::get('/{vendor}/transactions', [VendorPayoutController::class, 'transactions'])
+        ->name('transactions');
+
+    // Optional: PDF download
+    Route::get('/{vendor}/transactions/pdf', [VendorPayoutController::class, 'transactionsPdf'])
+        ->name('transactions.pdf');
 });
 
 
 
 });
 
-Route::middleware(['auth', 'vendor'])
-    ->prefix('vendor')
-    ->name('vendor.')
-    ->group(function () {
+Route::prefix('vendor')->middleware(['auth', 'vendor'])->group(function () {
+    Route::get('dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
+    
+    // Transactions page
+    Route::get('payouts', [\App\Http\Controllers\Admin\VendorPayoutController::class, 'transactions'])
+        ->name('vendor.payouts.transactions');
 
-        // Dashboard
-        Route::get('/dashboard', [VendorDashboardController::class, 'index'])
-            ->name('dashboard');
-
-        // List products
-        Route::get('/products', [VendorProductController::class, 'index'])
-            ->name('products.index');
-
-        // Show create product form
-        Route::get('/products/create', [VendorProductController::class, 'create'])
-            ->name('products.create');
-
-        // Store new product
-        Route::post('/products', [VendorProductController::class, 'store'])
-            ->name('products.store');
-
-        // Show single product
-        Route::get('/products/{product}', [VendorProductController::class, 'show'])
-            ->name('products.show');
-
-        // Show edit form
-        Route::get('/products/{product}/edit', [VendorProductController::class, 'edit'])
-            ->name('products.edit');
-
-        // Normal full update
-        Route::put('/products/{product}', [VendorProductController::class, 'update'])
-            ->name('products.update');
-
-        // Extra info update (your form)
-        Route::put('/products/{product}/update-info', [VendorProductController::class, 'updateInfo'])
-            ->name('products.updateinfo');
-
-        // Delete product
-        Route::delete('/products/{product}', [VendorProductController::class, 'destroy'])
-            ->name('products.destroy');
-
-        // ---------------- Variant Routes ----------------
-        Route::prefix('products/{product}/variants')
-            ->name('products.variants.')
-            ->group(function () {
-
-                // List variants
-                Route::get('/', [VendorProductVariantController::class, 'index'])
-                    ->name('index');
-
-                // Store new variant
-                Route::post('/store', [VendorProductVariantController::class, 'store'])
-                    ->name('store');
-
-                // Update variant
-                Route::put('/update/{variant}', [VendorProductVariantController::class, 'update'])
-                    ->name('update');
-
-                // Delete variant
-                Route::delete('/delete/{variant}', [VendorProductVariantController::class, 'destroy'])
-                    ->name('delete');
-
-                // Variant images
-                Route::prefix('{variant}/images')->name('images.')->group(function () {
-                    Route::get('/', [VendorProductImageController::class, 'index'])
-                        ->name('index');
-
-                    Route::post('/store', [VendorProductImageController::class, 'store'])
-                        ->name('store');
-
-                    Route::put('/{image}/set-primary', [VendorProductImageController::class, 'setPrimary'])
-                        ->name('set-primary');
-
-                    Route::delete('/{image}/delete', [VendorProductImageController::class, 'destroy'])
-                        ->name('delete');
-                });
-
-                // Variant stocks
-                Route::get('/stocks', [VendorProductStockController::class, 'variantStocks'])
-                    ->name('stocks');
-            });
-
-        // Orders
-        Route::get('/orders', [VendorOrderController::class, 'index'])
-            ->name('orders.index');
-
-        // Payouts
-        Route::get('/payouts', [VendorPayoutController::class, 'index'])
-            ->name('payouts.index');
-
-        // Profile
-        Route::get('/profile', [VendorProfileController::class, 'index'])
-            ->name('profile');
-    });
-
-
+    // Download PDF
+    Route::get('admin/vendor-payouts/{vendor}/transactions/pdf', [VendorPayoutController::class, 'transactionsPdf'])
+     ->name('vendor-payouts.transactions.pdf');
+});
 
 
 

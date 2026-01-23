@@ -238,69 +238,95 @@ class ProductMasterController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
-        DB::beginTransaction();
-        try {
-            // ================= VALIDATION =================
-            $validated = $request->validate([
-                'name'             => 'required|string|max:255',
-                'category_id'      => 'required|exists:categories,id',
-                'sub_category_id'  => 'nullable|exists:sub_categories,id',
-                'brand_id'         => 'nullable|exists:brands,id',
-                'sku'              => 'nullable|string|max:100|unique:products,sku',
-                'barcode'          => 'nullable|string|max:100|unique:products,barcode',
-                'item_code'        => 'nullable|string|max:100|unique:products,item_code',
-                'item_type'     => 'nullable|integer',
-                'description'      => 'nullable|string',
-                'thumbnail_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-                'collection'  => 'nullable|integer',
-                'season'   => 'nullable|integer',
-            ]);
+   public function store(Request $request)
+{
+    DB::beginTransaction();
 
-            // ================= IMAGE UPLOAD =================
-            $thumbnailName = null;
+    try {
+        // ================= AUTH USER =================
+        $user = auth()->user();
 
-            if ($request->hasFile('thumbnail_image')) {               
-                $image_name = 'thumbnail_image-' . date('YmdHis') . uniqid();
-                $thumbnailName = MyHelper::uploadImage($request->file('thumbnail_image'),$this->folder, $image_name);
-            }
+        // ================= VALIDATION =================
+        $validated = $request->validate([
+            'name'             => 'required|string|max:255',
+            'category_id'      => 'required|exists:categories,id',
+            'sub_category_id'  => 'nullable|exists:sub_categories,id',
+            'brand_id'         => 'nullable|exists:brands,id',
+            'sku'              => 'nullable|string|max:100|unique:products,sku',
+            'barcode'          => 'nullable|string|max:100|unique:products,barcode',
+            'item_code'        => 'nullable|string|max:100|unique:products,item_code',
+            'item_type'        => 'nullable|integer',
+            'description'      => 'nullable|string',
+            'thumbnail_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'collection'       => 'nullable|integer',
+            'season'           => 'nullable|integer',
 
-            // ================= CREATE PRODUCT =================
-            $product = Product::create([
-                'name'            => $request->name,
-                'slug'            => Str::slug($request->name),
-                'sku'             => $request->sku,
-                'description'     => $request->description,
-                'category_id'     => $request->category_id,
-                'sub_category_id' => $request->sub_category_id,
-                'brand_id'        => $request->brand_id,
-                'barcode'         => $request->barcode,
-                'item_type'       => $request->item_type,
-                'item_code'       => $request->item_code,
-                'collection'      => $request->collection,
-                'season'          => $request->season,
-                'thumbnail_image' => $thumbnailName,
+            // Admin only (optional)
+            'vendor_id'        => 'nullable|exists:users,vendor_id',
+        ]);
 
-                // switches
-                'status'          => 1,
-                'is_featured'     => 1,
-            ]);
+        // ================= IMAGE UPLOAD =================
+        $thumbnailName = null;
 
-            DB::commit();
-
-            return redirect()
-                ->route('manage-product.product-master.index')
-                ->with('success', 'Product created successfully');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with('error', $e->getMessage());
+        if ($request->hasFile('thumbnail_image')) {
+            $image_name = 'thumbnail_image-' . now()->format('YmdHis') . uniqid();
+            $thumbnailName = MyHelper::uploadImage(
+                $request->file('thumbnail_image'),
+                $this->folder,
+                $image_name
+            );
         }
+
+        // ================= VENDOR ID LOGIC =================
+        $vendorId = null;
+
+        if ($user->user_type === 'vendor') {
+            // Vendor can only create product for himself
+            $vendorId = $user->vendor_id;
+        } elseif ($user->user_type === 'admin') {
+            // Admin may assign vendor manually (optional)
+            $vendorId = $request->vendor_id;
+        }
+
+        // ================= CREATE PRODUCT =================
+        $product = Product::create([
+            'name'            => $request->name,
+            'slug'            => Str::slug($request->name),
+            'sku'             => $request->sku,
+            'description'     => $request->description,
+            'category_id'     => $request->category_id,
+            'sub_category_id' => $request->sub_category_id,
+            'brand_id'        => $request->brand_id,
+            'barcode'         => $request->barcode,
+            'item_type'       => $request->item_type,
+            'item_code'       => $request->item_code,
+            'collection'      => $request->collection,
+            'season'          => $request->season,
+            'thumbnail_image' => $thumbnailName,
+
+            // vendor ownership
+            'vendor_id'       => $vendorId,
+
+            // switches
+            'status'          => 1,
+            'is_featured'     => 1,
+        ]);
+
+        DB::commit();
+
+        return redirect()
+            ->route('manage-product.product-master.index')
+            ->with('success', 'Product created successfully');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return back()
+            ->withInput()
+            ->with('error', $e->getMessage());
     }
+}
+
     public function edit($id)
     {
         $user = auth()->user();

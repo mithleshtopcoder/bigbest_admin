@@ -153,9 +153,9 @@ public function payouts()
 // Calculate payable amount
 public function payableAmount()
 {
-    $totalEarnings = $this->orders()
-                          ->where('status', 'delivered')
-                          ->sum('total_amount'); // replace with your column
+    $totalEarnings = \App\Models\OrderItem::where('vendor_id', $this->vendor_id)
+                        ->whereHas('order', fn($q) => $q->where('status', 'delivered'))
+                        ->sum('total_price');
 
     $totalPaid = $this->payouts()->sum('amount');
 

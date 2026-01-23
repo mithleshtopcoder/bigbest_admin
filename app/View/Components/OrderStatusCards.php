@@ -16,75 +16,55 @@ class OrderStatusCards extends Component
     public $newOrderCount;
     public $newPosOrderCount;
 
-    public function __construct($currentStatus = null)
+   public function __construct($currentStatus = null)
 {
     $this->currentStatus = $currentStatus;
 
     $user = Auth::user();
-
-    $isSuperAdmin = $user->roles()
-        ->where('name', 'Super Admin')
-        ->exists();
-
-    /** ================= STORE ACCESS ================= */
-    $storeIds = collect();
-
-    if (! $isSuperAdmin) {
-
-        if ($user->store_id) {
-            $storeIds->push($user->store_id);
-        }
-
-        $storeIds = $storeIds
-            ->merge($user->stores()->pluck('stores.id'))
-            ->unique();
-    }
+    $isVendor = $user->user_type === 'vendor';
 
     /** ================= ONLINE BASE QUERY ================= */
     $onlineQuery = Order::where('order_source', 'online');
 
-    if (! $isSuperAdmin) {
-        if ($storeIds->isEmpty()) {
-            $onlineQuery->whereRaw('1 = 0');
-        } else {
-            $onlineQuery->whereIn('store_id', $storeIds);
-        }
-    }
-
     /** ================= POS BASE QUERY ================= */
     $posQuery = Order::where('order_source', 'pos');
 
-    if (! $isSuperAdmin) {
-        if ($storeIds->isEmpty()) {
-            $posQuery->whereRaw('1 = 0');
-        } else {
-            $posQuery->whereIn('store_id', $storeIds);
-        }
+    /**
+     * 🔒 VENDOR FILTER
+     * Only orders having order_items.vendor_id = auth vendor_id
+     */
+    if ($isVendor) {
+        $onlineQuery->whereHas('items', function ($q) use ($user) {
+            $q->where('vendor_id', $user->vendor_id);
+        });
+
+        $posQuery->whereHas('items', function ($q) use ($user) {
+            $q->where('vendor_id', $user->vendor_id);
+        });
     }
 
     /** ================= COUNTS ================= */
 
     // 🔵 New Online Orders
-    $this->newOrderCount = (clone $onlineQuery)
-        ->where('order_source', 'online')
+    $this->newOrderCount = (clone $onlineQuery)->count();
+
+    // 🟡 POS Orders
+    $this->newPosOrderCount = (clone $posQuery)
+        ->whereIn('status', ['pending', 'hold', 'delivered'])
         ->count();
 
-    // 🟡 New POS Orders (ONLY HERE)
-    $this->newPosOrderCount = (clone $posQuery)
-    ->whereIn('status', ['pending', 'hold','delivered'])
-    ->count();
-
-    // Online totals
+    // 🟢 Online totals
     $this->totalOrders = (clone $onlineQuery)->count();
     $this->totalAmount = (clone $onlineQuery)->sum('total_amount');
 
-    // 🚨 STATUS COUNTS → ONLINE ONLY
+    // 🔴 Status-wise counts (ONLINE ONLY)
     $this->statusCounts = (clone $onlineQuery)
-        ->select('status', DB::raw('COUNT(*) as total'))
+        ->select('status', DB::raw('COUNT(DISTINCT orders.id) as total'))
         ->groupBy('status')
         ->pluck('total', 'status')
         ->toArray();
 }
+
 
 
     public function render()

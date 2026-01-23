@@ -19,16 +19,22 @@
             <a href="{{ route('new-order.index', 'online') }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-left me-2"></i>Back to List
             </a>
+
+            @if($order->status === 'pending')
             <button class="btn btn-sm btn-success" onclick="acceptOrder('{{ $order->id }}')">
                 <i class="bi bi-check me-2"></i>Accept Order
             </button>
+
             <button class="btn btn-sm btn-danger" onclick="rejectOrder('{{ $order->id }}')">
                 <i class="bi bi-x me-2"></i>Reject Order
             </button>
+            @endif
+
             <button class="btn btn-sm btn-primary" onclick="window.print()">
                 <i class="bi bi-printer me-2"></i>Print
             </button>
         </div>
+
     </div>
 </div>
 <div class="main-body">
@@ -271,6 +277,7 @@
 
     /* Print Styles */
     @media print {
+
         .page-header,
         .btn,
         .breadcrumb,
@@ -297,5 +304,6 @@
             margin: 10px;
         }
     }
+
 </style>
 @endsection

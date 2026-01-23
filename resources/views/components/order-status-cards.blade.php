@@ -82,8 +82,8 @@ $statuses = [
 
     .dashboard-card.active .card {
         border-color: #ff0707f5 !important;
-    border-width: 1px !important;
-    box-shadow: 4px 4px 12px #ff0707b0 !important;
+        border-width: 1px !important;
+        box-shadow: 4px 4px 12px #ff0707b0 !important;
     }
 
     .dashboard-card.active:hover {

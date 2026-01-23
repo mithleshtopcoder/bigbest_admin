@@ -25,27 +25,46 @@ class NewOrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($type)
-    {
-        if ($type === 'pos') {
-            $orders = Order::with(['customer', 'store'])->where('order_source', 'pos')->orderBy('id', 'desc')->paginate(10); // Only POS orders
-            
-            return view('new-orders.pos.index', compact('orders'));
+   public function index($type)
+{
+    $user = auth()->user();
+
+    if ($type === 'pos') {
+
+        // Block vendors from POS
+        if ($user->user_type === 'vendor') {
+            abort(403);
         }
-        
-        if ($type === 'online') {
-            // ✅ Fetch ONLY online orders
-            $orders = Order::with('customer')
-            ->where('order_source', 'online') // Important filter
+
+        $orders = Order::with(['customer', 'store'])
+            ->where('order_source', 'pos')
             ->latest()
             ->paginate(10);
-            
-            return view('new-orders.online.index', compact('orders'));
-        }
-        
-        // Optional: handle unknown type
-        abort(404, 'Order type not found');
+
+        return view('new-orders.pos.index', compact('orders'));
     }
+
+    if ($type === 'online') {
+
+        $orders = Order::with('customer')
+            ->where('order_source', 'online');
+
+        // ✅ KEY PART: match vendor_id correctly
+        if ($user->user_type === 'vendor') {
+            $orders->whereHas('items', function ($q) use ($user) {
+                $q->where('vendor_id', $user->vendor_id);
+            });
+        }
+
+        $orders = $orders->latest()->paginate(10);
+
+        return view('new-orders.online.index', compact('orders'));
+    }
+
+    abort(404, 'Order type not found');
+}
+
+
     
     
     
@@ -150,47 +169,42 @@ public function datatableonline()
     $user = auth()->user();
 
     $orders = Order::with('customer')
+        ->withCount('items')
         ->where('order_source', 'online');
 
-    // 🔐 Restrict data for non Super Admin
-    if (! $user->hasRole('Super Admin')) {
-        $orders->where('store_id', $user->store_id);
+    // 🔒 VENDOR: only their own products, NO NULL vendor_id
+    if ($user->user_type === 'vendor') {
+        $orders->whereHas('items', function ($q) use ($user) {
+            $q->where('vendor_id', $user->vendor_id); // ✅ strict match
+        });
     }
 
     return datatables()->of($orders)
-        ->addColumn('order', function ($o) {
-            return '<div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-cart-check text-primary fs-5"></i>
-                        <a>#'.$o->order_number.'</a>
-                    </div>';
-        })
-        ->addColumn('date_time', function ($o) {
-            return $o->created_at->format('Y-m-d') .
-                '<br><small class="text-muted">' .
-                $o->created_at->format('h:i A') .
-                '</small>';
-        })
-        ->addColumn('customer', function ($o) {
-            $name  = $o->customer->full_name ?? 'Guest';
-            $email = $o->customer->email ?? '';
-            return '<a href="javascript:void(0)">
-                        '.$name.'<br>
-                        <small class="text-muted">'.$email.'</small>
-                    </a>';
-        })
+        ->addColumn('order', fn($o) =>
+            '<div class="d-flex align-items-center gap-2">
+                <i class="bi bi-cart-check text-primary fs-5"></i>
+                <a>#'.$o->order_number.'</a>
+            </div>'
+        )
+        ->addColumn('date_time', fn($o) =>
+            $o->created_at->format('Y-m-d') .
+            '<br><small class="text-muted">' .
+            $o->created_at->format('h:i A') .
+            '</small>'
+        )
+        ->addColumn('customer', fn($o) =>
+            '<a href="javascript:void(0)">
+                '.($o->customer->full_name ?? 'Guest').'<br>
+                <small class="text-muted">'.($o->customer->email ?? '').'</small>
+            </a>'
+        )
         ->addColumn('items', fn($o) =>
-            '<span class="badge bg-gray-200 text-dark">'.($o->items_count ?? 0).' items</span>'
+            '<span class="badge bg-gray-200 text-dark">'.$o->items_count.' items</span>'
         )
         ->addColumn('amount', fn($o) =>
             '<strong>₹'.number_format($o->total_amount, 2).'</strong>'
         )
-        ->addColumn('payment', function ($o) {
-            $cls = strtolower($o->payment_status) === 'paid' ? 'success' : 'warning';
-            return '<span class="badge bg-soft-'.$cls.' text-'.$cls.'">'.
-                ucfirst($o->payment_status).
-            '</span>';
-        })
-        ->addColumn('status', function ($o) {
+       ->addColumn('status', function ($o) {
             $statusClass = match($o->status) {
                 'accepted', 'confirmed' => 'bg-soft-primary text-primary',
                 'preparing', 'processing' => 'bg-soft-info text-info',
@@ -204,18 +218,13 @@ public function datatableonline()
                 ucfirst(str_replace('_',' ',$o->status)).
             '</span>';
         })
-        ->addColumn('action', function ($o) {
-            $url = route('new-order.view', ['type' => 'online', 'id' => $o->id]);
-            return '<div class="d-flex justify-content-end gap-1">
-                        <a href="'.$url.'" class="btn btn-sm btn-link text-primary">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                    </div>';
-        })
-        ->rawColumns([
-            'order','date_time','customer',
-            'items','amount','payment','status','action'
-        ])
+        ->addColumn('action', fn($o) =>
+            '<a href="'.route('new-order.view', ['type' => 'online', 'id' => $o->id]).'"
+                class="btn btn-sm btn-link text-primary">
+                <i class="bi bi-eye"></i>
+            </a>'
+        )
+        ->rawColumns(['order','date_time','customer','items','amount','status','action'])
         ->make(true);
 }
 
