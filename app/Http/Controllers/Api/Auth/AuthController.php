@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use App\Models\CustomerAddress;
+use App\Services\SmsOtpService;
+use App\Jobs\SendSmsJob;
 
 
 class AuthController extends Controller
@@ -51,6 +53,14 @@ class AuthController extends Controller
 
         $token = $customer->createToken('customer-token')->plainTextToken;
 
+         SendSmsJob::dispatch(
+    'welcome_customer',        // template key
+    $customer->phone,          // customer phone
+    [
+        'NAME' => $customer->first_name
+    ]
+    );
+
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',
@@ -64,35 +74,85 @@ class AuthController extends Controller
     /**
      * Login customer
      */
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required_without:phone|email',
-            'phone' => 'required_without:email|string',
-            'password' => 'required|string',
-        ]);
+      public function login(Request $request, SmsOtpService $otpService)
+{
+    // Validate inputs
+    $validator = Validator::make($request->all(), [
+        'email' => 'required_without:phone|email',
+        'phone' => 'required_without:email|string',
+        'password' => 'nullable|string', // optional for OTP login
+        'otp' => 'nullable|string|size:6', // optional for OTP login
+        'flow' => 'nullable|in:login,signup', // default OTP flow
+        'device_token' => 'nullable|string',
+        'device_id' => 'nullable|string',
+        'fcm_token' => 'nullable|string',
+    ]);
 
-        if ($validator->fails()) {
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $phone = $request->phone;
+    $email = $request->email;
+
+    // -----------------------------
+    // 1️⃣ OTP LOGIN
+    // -----------------------------
+    if ($phone && $request->has('otp')) {
+        try {
+            $data = $otpService->verifyOtp($phone, $request->otp, $request->flow ?? 'login');
+
+            // Update device info
+            if (isset($data['user'])) {
+                $data['user']->update($request->only(['device_token', 'device_id', 'fcm_token']));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP verified successfully',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 400);
         }
+    }
 
-        $credentials = [];
-        if ($request->email) {
-            $credentials['email'] = $request->email;
-        } else {
-            $credentials['phone'] = $request->phone;
+    // -----------------------------
+    // 2️⃣ Auto-send OTP if phone is provided but no password or OTP
+    // -----------------------------
+    if ($phone && !$request->password) {
+        try {
+            $data = $otpService->sendOtp($phone, $request->flow ?? 'login');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 400);
         }
-        $credentials['password'] = $request->password;
+    }
 
-        $customer = Customer::where('email', $request->email)
-            ->orWhere('phone', $request->phone)
+    // -----------------------------
+    // 3️⃣ PASSWORD LOGIN
+    // -----------------------------
+    if ($password = $request->password) {
+        $customer = Customer::where('email', $email)
+            ->orWhere('phone', $phone)
             ->first();
 
-        if (!$customer || !Hash::check($request->password, $customer->password)) {
+        if (!$customer || !\Hash::check($password, $customer->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials'
@@ -106,13 +166,8 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Update device token if provided
-        if ($request->device_token) {
-            $customer->update(['device_token' => $request->device_token]);
-        }
-        if ($request->fcm_token) {
-            $customer->update(['fcm_token' => $request->fcm_token]);
-        }
+        // Update device info
+        $customer->update($request->only(['device_token', 'device_id', 'fcm_token']));
 
         $token = $customer->createToken('customer-token')->plainTextToken;
 
@@ -125,6 +180,15 @@ class AuthController extends Controller
             ]
         ], 200);
     }
+
+    // -----------------------------
+    // 4️⃣ If none of the above, invalid request
+    // -----------------------------
+    return response()->json([
+        'success' => false,
+        'message' => 'Provide valid login credentials (password or OTP).'
+    ], 422);
+}
 
     /**
      * Get customer profile

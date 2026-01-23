@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Jobs\SendSmsJob;
 use App\Models\ProductVariant;
 use App\Models\ProductStock;
 use App\Models\Store;
@@ -161,6 +162,16 @@ public function index(Request $request, CartPricingService $pricingService)
             'notes' => $request->notes,
         ]);
     }
+SendSmsJob::dispatch(
+    'abandoned_cart',     // SMS template key
+    $customer->phone,     // Customer phone
+    [
+        'customer_id' => $customer->id,
+        'customer_name' => $customer->name,
+        'cart_item_id' => $cartItem->id,
+    ],
+    'sms'
+)->delay(now()->addHours(24));
 
     return response()->json([
         'success' => true,

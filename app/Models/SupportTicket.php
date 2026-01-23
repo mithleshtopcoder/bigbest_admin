@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Jobs\SendSmsJob;
+use Illuminate\Support\Facades\Log;
 
 class SupportTicket extends Model
 {
@@ -38,11 +40,51 @@ class SupportTicket extends Model
     {
         parent::boot();
 
+        // Generate ticket number on creation
         static::creating(function ($ticket) {
             if (empty($ticket->ticket_number)) {
                 $ticket->ticket_number = 'TKT-' . strtoupper(Str::random(8));
             }
         });
+
+        // Send SMS on ticket creation
+        static::created(function ($ticket) {
+            $ticket->sendTicketSms('support_ticket_update'); // you can use a different template for creation if needed
+        });
+
+        // Send SMS on ticket update (status change)
+        static::updated(function ($ticket) {
+            if ($ticket->isDirty('status')) {
+                $ticket->sendTicketSms('support_ticket_update');
+            }
+        });
+    }
+
+    /**
+     * Send SMS to the customer
+     */
+    public function sendTicketSms(string $templateKey)
+    {
+        $customer = $this->customer;
+
+        if ($customer && $customer->phone) {
+            try {
+                SendSmsJob::dispatch(
+                    $templateKey,
+                    $customer->phone,
+                    [
+                        'NAME' => $customer->first_name,
+                        'TICKETID' => $this->ticket_number,
+                    ]
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to send support ticket SMS', [
+                    'ticket_id' => $this->id,
+                    'customer_id' => $customer->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**

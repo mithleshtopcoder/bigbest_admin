@@ -7,55 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\InvoiceService;
 use App\Models\User;
+use App\Jobs\SendSmsJob;
+
 
 class Order extends Model
 {
     use HasFactory, SoftDeletes;
-
-    protected static function boot()
-{
-    parent::boot();
-
-    static::updated(function ($order) {
-
-        // 1️⃣ Check if status changed
-        if ($order->isDirty('status')) {
-            $oldStatus = $order->getOriginal('status');
-            $newStatus = $order->status;
-
-            if ($oldStatus !== $newStatus) {
-                try {
-                    // Call your existing NotificationController method
-                    app(\App\Http\Controllers\Api\NotificationController::class)
-                        ->createNotification(
-                            $order->customer_id,
-                            'order',
-                            'Order Status Updated',
-                            "Your order #{$order->order_number} status changed from {$oldStatus} to {$newStatus}.",
-                            [
-                                'order_id' => $order->id,
-                                'old_status' => $oldStatus,
-                                'new_status' => $newStatus
-                            ]
-                        );
-                } catch (\Exception $e) {
-                    \Log::error('Failed to send order status notification: ' . $e->getMessage());
-                }
-            }
-        }
-
-        // 2️⃣ Existing invoice generation when delivered
-        if ($order->isDirty('status') && $order->status === 'delivered' && !$order->file_name) {
-            try {
-                $invoiceService = new \App\Services\InvoiceService();
-                $invoiceService->dispatchGenerateInvoice($order, true);
-            } catch (\Exception $e) {
-                \Log::error('Failed to dispatch invoice generation job on order status update: ' . $e->getMessage());
-            }
-        }
-    });
-}
-
 
     protected $fillable = [
         'order_number',
@@ -152,5 +109,112 @@ class Order extends Model
     public function scopeOnline($query)
 {
     return $query->where('order_source', 'online');
+}
+
+  protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($order) {
+            $order->handleStatusChange();
+        });
+    }
+
+    // --------------------------- STATUS CHANGE HANDLER ---------------------------
+ private function handleStatusChange()
+{
+    if (!$this->isDirty('status')) return;
+
+    $oldStatus = $this->getOriginal('status');
+    $newStatus = $this->status;
+
+    if ($oldStatus === $newStatus) return;
+
+    // 1️⃣ Send Notification
+    $this->sendStatusNotification($oldStatus, $newStatus);
+
+    // 2️⃣ Send Status SMS
+    $this->sendStatusSms($newStatus);
+
+    // 3️⃣ Dispatch invoice if delivered
+    if ($newStatus === 'delivered' && !$this->file_name) {
+        $this->dispatchInvoiceGeneration();
+    }
+
+    // 4️⃣ Send feedback SMS when delivered
+    if ($newStatus === 'delivered') {
+        $this->sendFeedbackRequestSms();
+    }
+}
+
+
+    // --------------------------- PRIVATE METHODS ---------------------------
+
+    private function sendStatusNotification($oldStatus, $newStatus)
+    {
+        try {
+            app(\App\Http\Controllers\Api\NotificationController::class)
+                ->createNotification(
+                    $this->customer_id,
+                    'order',
+                    'Order Status Updated',
+                    "Your order #{$this->order_number} status changed from {$oldStatus} to {$newStatus}.",
+                    [
+                        'order_id' => $this->id,
+                        'old_status' => $oldStatus,
+                        'new_status' => $newStatus
+                    ]
+                );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send order status notification: ' . $e->getMessage());
+        }
+    }
+
+    private function sendStatusSms($newStatus)
+    {
+        try {
+            $customer = $this->customer;
+            if ($customer && $customer->phone) {
+                SendSmsJob::dispatch(
+                    'order_status_update', // template key
+                    $customer->phone,
+                    [
+                        'NAME' => $customer->first_name,
+                        'ORDER_ID' => $this->order_number,
+                        'ORDER_STATUS' => ucfirst($newStatus),
+                        'OPTIONAL_MESSAGE' => 'Thank you for shopping with us.'
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send order status SMS: ' . $e->getMessage());
+        }
+    }
+
+    private function sendFeedbackRequestSms()
+{
+    try {
+        $customer = $this->customer;
+        if ($customer && $customer->phone) {
+            SendSmsJob::dispatch(
+                'feedback_request', // your feedback template key
+                $customer->phone,
+                [
+                    'NAME' => $customer->first_name,
+                    'ORDER_ID' => $this->order_number,
+                ]
+            );
+
+            \Log::info("Feedback request SMS queued", [
+                'order_id' => $this->id,
+                'customer_id' => $customer->id,
+                'phone' => $customer->phone
+            ]);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Failed to send feedback request SMS: ' . $e->getMessage(), [
+            'order_id' => $this->id
+        ]);
+    }
 }
 }
