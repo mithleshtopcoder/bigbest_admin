@@ -13,7 +13,7 @@ use App\Jobs\SendSmsJob;
 class Order extends Model
 {
     use HasFactory, SoftDeletes;
-
+// sfs
     protected $fillable = [
         'order_number',
         'customer_id',
