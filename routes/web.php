@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\ConfigurationSettingsController;
+use App\Http\Controllers\Admin\CommunicationProviderController;
+use App\Http\Controllers\Admin\SmsTemplateController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
@@ -533,7 +535,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/company-setup', [ConfigurationSettingsController::class, 'storeCompanySetup'])->name('configuration-settings.company-setup.store');
         Route::get('/payment-methods', [ConfigurationSettingsController::class, 'paymentMethods'])->name('configuration-settings.payment-methods');
         Route::get('/tax-settings', [ConfigurationSettingsController::class, 'taxSettings'])->name('configuration-settings.tax-settings');
-    });
+         Route::post('/communication-providers', [CommunicationProviderController::class, 'store'])->name('configuration-settings.communication-providers.store');
+        Route::put('/communication-providers/{communicationProvider}', [CommunicationProviderController::class, 'update'])->name('configuration-settings.communication-providers.update');
+        Route::post('/sms-templates', [SmsTemplateController::class, 'store'])->name('configuration-settings.sms-templates.store');
+        Route::put('/sms-templates/{smsTemplate}', [SmsTemplateController::class, 'update'])->name('configuration-settings.sms-templates.update');
+        Route::delete('/sms-templates/{smsTemplate}', [SmsTemplateController::class, 'destroy'])->name('configuration-settings.sms-templates.destroy');
+        });
 
     // ==================== LOGS & AUDIT ROUTES ====================
     Route::prefix('logs-audit')->group(function () {

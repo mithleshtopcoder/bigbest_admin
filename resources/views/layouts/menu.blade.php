@@ -42,143 +42,143 @@
             {{-- POS Order (optional: admin only) --}}
             @if(auth()->user()->user_type !== 'vendor')
             @can('pos-orders.list')
-            <li class="menu-item">
-                <a href="{{ route('new-order.index', 'pos') }}" class="menu-link {{ request()->routeIs('new-order.index') && request()->route('type') == 'pos' ? 'active' : '' }}">
-                    POS Order
-                </a>
-            </li>
-            @endcan
-            @endif
-
-            {{-- Online Order (vendor + admin) --}}
-            @if(auth()->user()->user_type === 'vendor' || auth()->user()->can('online-orders.list'))
-            <li class="menu-item">
-                <a href="{{ route('new-order.index', 'online') }}" class="menu-link {{ request()->routeIs('new-order.index') && request()->route('type') == 'online' ? 'active' : '' }}">
-                    Online Order
-                </a>
-            </li>
-            @endif
-
-        </ul>
-    </li>
-    @endif
-
-
-    @can('online-orders.status')
-    <li class="menu-item has-submenu {{ request()->routeIs('order-status.*') ? 'open' : '' }}">
-        <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('order-status.*') ? 'active' : '' }}">
-            <i class="bi bi-list-check menu-icon"></i>
-            <span class="menu-text">Order Status</span>
-            <i class="bi bi-chevron-right menu-arrow"></i>
-        </a>
-        <ul class="submenu order-status-submenu">
-            @can('order-status-accepted.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'accepted') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'accepted' ? 'active' : '' }}">Accepted</a>
-            </li>
-            @endcan
-            @can('order-status-preparing.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'preparing') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'preparing' ? 'active' : '' }}">Preparing</a>
-            </li>
-            @endcan
-            @can('order-status-ready-to-ship.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'ready') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'ready' ? 'active' : '' }}">Ready
-                    To Ship</a></li>
-            @endcan
-            @can('order-status-shipped.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'shipped') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'shipped' ? 'active' : '' }}">Shipped</a>
-            </li>
-            @endcan
-            @can('order-status-out-for-delivery.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'out-for-delivery') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'out-for-delivery' ? 'active' : '' }}">Out
-                    for Delivery</a></li>
-            @endcan
-            @can('order-status-completed.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'completed') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'completed' ? 'active' : '' }}">Completed</a>
-            </li>
-            @endcan
-            @can('order-status-cancelled.list')
-            <li class="menu-item"><a href="{{ route('order-status.index', 'cancelled') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'cancelled' ? 'active' : '' }}">Cancelled</a>
-            </li>
-            @endcan
-        </ul>
-    </li>
-    @endcan
-    @if(auth()->check() && (
-    auth()->user()->user_type === 'vendor' ||
-    auth()->user()->can('product-master.list') ||
-    auth()->user()->can('product-category.list') ||
-    auth()->user()->can('product-sub-category.list') ||
-    auth()->user()->can('brand.list')
-    ))
-    <li class="menu-item has-submenu {{ request()->routeIs('manage-product.*') && !request()->routeIs('manage-product.offer.*') ? 'open' : '' }}">
-        <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('manage-product.*') && !request()->routeIs('manage-product.offer.*') ? 'active' : '' }}">
-            <i class="bi bi-box menu-icon"></i>
-            <span class="menu-text">Manage Product</span>
-            <i class="bi bi-chevron-right menu-arrow"></i>
-        </a>
-
-        <ul class="submenu order-status-submenu">
-
-            {{-- Product Master (Vendor + Admin) --}}
-            @if(auth()->user()->user_type === 'vendor' || auth()->user()->can('product-master.list'))
-            <li class="menu-item">
-                <a href="{{ route('manage-product.product-master.index') }}" class="menu-link {{ request()->routeIs('manage-product.product-master.*') ? 'active' : '' }}">
-                    Product Master
-                </a>
-            </li>
-            @endif
-
-            {{-- Admin / Staff only --}}
-            @if(auth()->user()->user_type !== 'vendor')
-
-            @can('product-category.list')
-            <li class="menu-item">
-                <a href="{{ route('manage-product.category.index') }}" class="menu-link {{ request()->routeIs('manage-product.category.*') ? 'active' : '' }}">
-                    Categories
-                </a>
-            </li>
-            @endcan
-
-            @can('product-sub-category.list')
-            <li class="menu-item">
-                <a href="{{ route('manage-product.sub-category.index') }}" class="menu-link {{ request()->routeIs('manage-product.sub-category.*') ? 'active' : '' }}">
-                    Sub-Categories
-                </a>
-            </li>
-            @endcan
-
-            @can('brand.list')
-            <li class="menu-item">
-                <a href="{{ route('manage-product.brands.index') }}" class="menu-link {{ request()->routeIs('manage-product.brands.*') ? 'active' : '' }}">
-                    Brands
-                </a>
-            </li>
-            @endcan
-
-            @endif
-
-        </ul>
-    </li>
-    @endif
-
-
-    @can('coupon.list')
-    <li class="menu-item has-submenu {{ request()->routeIs('manage-product.offer.*') ? 'open' : '' }}">
-        <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('manage-product.offer.*') ? 'active' : '' }}">
-            <i class="bi bi-box menu-icon"></i>
-            <span class="menu-text">Offers</span>
-            <i class="bi bi-chevron-right menu-arrow"></i>
-        </a>
-        <ul class="submenu order-status-submenu">
-            <li class="menu-item">
-                <a href="{{ route('manage-product.offer.index', 'coupons') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'coupons' ? 'active' : '' }}">Coupons</a>
-            </li>
-            <li class="menu-item">
-                <a href="{{ route('manage-product.offer.index', 'discounts') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'discounts' ? 'active' : '' }}">Discounts</a>
-            </li>
             {{-- <li class="menu-item">
-                    <a href="{{ route('manage-product.offer.index', 'combo-offers') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'combo-offers' ? 'active' : '' }}">Combo Offers</a>
+                <a href="{{ route('new-order.index', 'pos') }}" class="menu-link {{ request()->routeIs('new-order.index') && request()->route('type') == 'pos' ? 'active' : '' }}">
+            POS Order
+            </a>
     </li> --}}
+    @endcan
+    @endif
+
+    {{-- Online Order (vendor + admin) --}}
+    @if(auth()->user()->user_type === 'vendor' || auth()->user()->can('online-orders.list'))
+    <li class="menu-item">
+        <a href="{{ route('new-order.index', 'online') }}" class="menu-link {{ request()->routeIs('new-order.index') && request()->route('type') == 'online' ? 'active' : '' }}">
+            Online Order
+        </a>
+    </li>
+    @endif
+
+</ul>
+</li>
+@endif
+
+
+@can('online-orders.status')
+<li class="menu-item has-submenu {{ request()->routeIs('order-status.*') ? 'open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('order-status.*') ? 'active' : '' }}">
+        <i class="bi bi-list-check menu-icon"></i>
+        <span class="menu-text">Order Status</span>
+        <i class="bi bi-chevron-right menu-arrow"></i>
+    </a>
+    <ul class="submenu order-status-submenu">
+        @can('order-status-accepted.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'accepted') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'accepted' ? 'active' : '' }}">Accepted</a>
+        </li>
+        @endcan
+        @can('order-status-preparing.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'preparing') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'preparing' ? 'active' : '' }}">Preparing</a>
+        </li>
+        @endcan
+        @can('order-status-ready-to-ship.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'ready') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'ready' ? 'active' : '' }}">Ready
+                To Ship</a></li>
+        @endcan
+        @can('order-status-shipped.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'shipped') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'shipped' ? 'active' : '' }}">Shipped</a>
+        </li>
+        @endcan
+        @can('order-status-out-for-delivery.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'out-for-delivery') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'out-for-delivery' ? 'active' : '' }}">Out
+                for Delivery</a></li>
+        @endcan
+        @can('order-status-completed.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'completed') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'completed' ? 'active' : '' }}">Completed</a>
+        </li>
+        @endcan
+        @can('order-status-cancelled.list')
+        <li class="menu-item"><a href="{{ route('order-status.index', 'cancelled') }}" class="menu-link {{ request()->routeIs('order-status.index') && request()->route('status') == 'cancelled' ? 'active' : '' }}">Cancelled</a>
+        </li>
+        @endcan
+    </ul>
+</li>
+@endcan
+@if(auth()->check() && (
+auth()->user()->user_type === 'vendor' ||
+auth()->user()->can('product-master.list') ||
+auth()->user()->can('product-category.list') ||
+auth()->user()->can('product-sub-category.list') ||
+auth()->user()->can('brand.list')
+))
+<li class="menu-item has-submenu {{ request()->routeIs('manage-product.*') && !request()->routeIs('manage-product.offer.*') ? 'open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('manage-product.*') && !request()->routeIs('manage-product.offer.*') ? 'active' : '' }}">
+        <i class="bi bi-box menu-icon"></i>
+        <span class="menu-text">Manage Product</span>
+        <i class="bi bi-chevron-right menu-arrow"></i>
+    </a>
+
+    <ul class="submenu order-status-submenu">
+
+        {{-- Product Master (Vendor + Admin) --}}
+        @if(auth()->user()->user_type === 'vendor' || auth()->user()->can('product-master.list'))
+        <li class="menu-item">
+            <a href="{{ route('manage-product.product-master.index') }}" class="menu-link {{ request()->routeIs('manage-product.product-master.*') ? 'active' : '' }}">
+                Product Master
+            </a>
+        </li>
+        @endif
+
+        {{-- Admin / Staff only --}}
+        @if(auth()->user()->user_type !== 'vendor')
+
+        @can('product-category.list')
+        <li class="menu-item">
+            <a href="{{ route('manage-product.category.index') }}" class="menu-link {{ request()->routeIs('manage-product.category.*') ? 'active' : '' }}">
+                Categories
+            </a>
+        </li>
+        @endcan
+
+        @can('product-sub-category.list')
+        <li class="menu-item">
+            <a href="{{ route('manage-product.sub-category.index') }}" class="menu-link {{ request()->routeIs('manage-product.sub-category.*') ? 'active' : '' }}">
+                Sub-Categories
+            </a>
+        </li>
+        @endcan
+
+        @can('brand.list')
+        <li class="menu-item">
+            <a href="{{ route('manage-product.brands.index') }}" class="menu-link {{ request()->routeIs('manage-product.brands.*') ? 'active' : '' }}">
+                Brands
+            </a>
+        </li>
+        @endcan
+
+        @endif
+
+    </ul>
+</li>
+@endif
+
+
+@can('coupon.list')
+<li class="menu-item has-submenu {{ request()->routeIs('manage-product.offer.*') ? 'open' : '' }}">
+    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('manage-product.offer.*') ? 'active' : '' }}">
+        <i class="bi bi-box menu-icon"></i>
+        <span class="menu-text">Offers</span>
+        <i class="bi bi-chevron-right menu-arrow"></i>
+    </a>
+    <ul class="submenu order-status-submenu">
+        <li class="menu-item">
+            <a href="{{ route('manage-product.offer.index', 'coupons') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'coupons' ? 'active' : '' }}">Coupons</a>
+        </li>
+        <li class="menu-item">
+            <a href="{{ route('manage-product.offer.index', 'discounts') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'discounts' ? 'active' : '' }}">Discounts</a>
+        </li>
+        {{-- <li class="menu-item">
+                    <a href="{{ route('manage-product.offer.index', 'combo-offers') }}" class="menu-link {{ request()->routeIs('manage-product.offer.index') && request()->route('type') == 'combo-offers' ? 'active' : '' }}">Combo Offers</a>
+</li> --}}
 </ul>
 </li>
 @endcan
@@ -299,31 +299,31 @@
 @endif
 
 
-@canany(['manage-store.list', 'service-radius.list'])
+{{-- @canany(['manage-store.list', 'service-radius.list'])
 <li class="menu-item has-submenu {{ request()->routeIs('store-management.*') ? 'open' : '' }}">
-    <a href="javascript:void(0);" class="menu-link {{ request()->routeIs('store-management.*') ? 'active' : '' }}">
-        <i class="bi bi-house menu-icon"></i>
-        <span class="menu-text">Store Management</span>
-        <i class="bi bi-chevron-right menu-arrow"></i>
-    </a>
-    <ul class="submenu order-status-submenu">
-        @can('manage-store.list')
-        <li class="menu-item">
-            <a href="{{ route('store-management.manage-store') }}" class="menu-link {{ request()->routeIs('store-management.manage-store*') ? 'active' : '' }}">
-                Manage Store
-            </a>
-        </li>
-        @endcan
-        @can('service-radius.list')
-        <li class="menu-item">
-            <a href="{{ route('store-management.service-radius') }}" class="menu-link {{ request()->routeIs('store-management.service-radius*') ? 'active' : '' }}">
-                Service Radius
-            </a>
-        </li>
-        @endcan
-    </ul>
+<a href="javascript:void(0);" class="menu-link {{ request()->routeIs('store-management.*') ? 'active' : '' }}">
+    <i class="bi bi-house menu-icon"></i>
+    <span class="menu-text">Store Management</span>
+    <i class="bi bi-chevron-right menu-arrow"></i>
+</a>
+<ul class="submenu order-status-submenu">
+    @can('manage-store.list')
+    <li class="menu-item">
+        <a href="{{ route('store-management.manage-store') }}" class="menu-link {{ request()->routeIs('store-management.manage-store*') ? 'active' : '' }}">
+            Manage Store
+        </a>
+    </li>
+    @endcan
+    @can('service-radius.list')
+    <li class="menu-item">
+        <a href="{{ route('store-management.service-radius') }}" class="menu-link {{ request()->routeIs('store-management.service-radius*') ? 'active' : '' }}">
+            Service Radius
+        </a>
+    </li>
+    @endcan
+</ul>
 </li>
-@endcanany
+@endcanany --}}
 
 @canany(['store-ledger.list', 'customer-ledger.list', 'supplier-ledger.list', 'expenses.list',
 'payments-receipts.list'])
@@ -354,7 +354,7 @@
 </li>
 @endcanany
 
-@canany(['sales-reports.list', 'pos-reports.list', 'app-orders-reports.list', 'inventory-reports.list',
+{{-- @canany(['sales-reports.list', 'pos-reports.list', 'app-orders-reports.list', 'inventory-reports.list',
 'expense-reports.list', 'employee-sales-reports.list'])
 <li class="menu-item has-submenu">
     <a href="javascript:void(0);" class="menu-link">
@@ -365,27 +365,27 @@
     <ul class="submenu order-status-submenu">
         @can('sales-reports.list')
         <li class="menu-item"><a href="{{ route('reports-analytics.sales-reports') }}" class="menu-link">Sales
-                Reports</a></li>
-        @endcan
-        @can('pos-reports.list')
-        <li class="menu-item"><a href="{{ route('reports-analytics.pos-reports') }}" class="menu-link">POS
-                Reports</a></li>
-        @endcan
-        @can('app-orders-reports.list')
-        <li class="menu-item"><a href="{{ route('reports-analytics.app-orders-reports') }}" class="menu-link">App Orders Reports</a></li>
-        @endcan
-        @can('inventory-reports.list')
-        <li class="menu-item"><a href="{{ route('reports-analytics.inventory-report') }}" class="menu-link">Inventory Report</a></li>
-        @endcan
-        @can('expense-reports.list')
-        <li class="menu-item"><a href="{{ route('reports-analytics.expense-report') }}" class="menu-link">Expense Report</a></li>
-        @endcan
-        @can('employee-sales-reports.list')
-        <li class="menu-item"><a href="{{ route('reports-analytics.employee-sales-report') }}" class="menu-link">Employee Sales Report</a></li>
-        @endcan
-    </ul>
+Reports</a></li>
+@endcan
+@can('pos-reports.list')
+<li class="menu-item"><a href="{{ route('reports-analytics.pos-reports') }}" class="menu-link">POS
+        Reports</a></li>
+@endcan
+@can('app-orders-reports.list')
+<li class="menu-item"><a href="{{ route('reports-analytics.app-orders-reports') }}" class="menu-link">App Orders Reports</a></li>
+@endcan
+@can('inventory-reports.list')
+<li class="menu-item"><a href="{{ route('reports-analytics.inventory-report') }}" class="menu-link">Inventory Report</a></li>
+@endcan
+@can('expense-reports.list')
+<li class="menu-item"><a href="{{ route('reports-analytics.expense-report') }}" class="menu-link">Expense Report</a></li>
+@endcan
+@can('employee-sales-reports.list')
+<li class="menu-item"><a href="{{ route('reports-analytics.employee-sales-report') }}" class="menu-link">Employee Sales Report</a></li>
+@endcan
+</ul>
 </li>
-@endcanany
+@endcanany --}}
 
 @canany(['about-us.list', 'contact-us.list', 'manage-policies.list', 'banners.list', 'social-media.list',
 'faqs.list'])
