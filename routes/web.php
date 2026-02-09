@@ -64,6 +64,7 @@ use App\Http\Controllers\Vendor\VendorDashboardController;
 
 
 Route::middleware('auth')->group(function () {
+    
     // ==================== BASIC ROUTES ====================
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::get('/blank', [ProfileController::class, 'blank'])->name('blank');
