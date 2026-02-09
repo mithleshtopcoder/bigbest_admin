@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AppSetting;
 use App\Helpers\MyHelper;
+use App\Models\CommunicationProvider;
+use App\Models\SmsTemplate;
 
 class ConfigurationSettingsController extends Controller
 {
@@ -22,11 +24,24 @@ class ConfigurationSettingsController extends Controller
     /**
      * Show Company Setup Page
      */
-    public function companySetup()
+   public function companySetup()
     {
         $settings = AppSetting::first();
-        return view('configuration-settings.company-setup.index', compact('settings'));
+        $smsTemplates = SmsTemplate::where('channel', 'sms')->orderBy('name')->get();
+        $whatsappTemplates = SmsTemplate::where('channel', 'whatsapp')->orderBy('name')->get();
+        $smsProvider = CommunicationProvider::where('channel', 'sms')
+            ->where('is_active', true)
+            ->latest('id')
+            ->first();
+
+        $whatsappProvider = CommunicationProvider::where('channel', 'whatsapp')
+            ->where('is_active', true)
+            ->latest('id')
+            ->first();
+
+        return view('configuration-settings.company-setup.index', compact('settings', 'smsTemplates', 'whatsappTemplates', 'smsProvider', 'whatsappProvider'));
     }
+
 
     /**
      * Store / Update Company Setup (TAB-WISE SAFE)
